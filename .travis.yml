@@ -10,7 +10,6 @@ language: python
 
 notifications:
   email: "sacrud@uralbash.ru"
-  email: "arkadiy@bk.ru"
 
 python:
   - "2.7"
@@ -22,15 +21,11 @@ env:
 
 install:
   - pip install nose coverage coveralls
-  - pip install pyramid pyramid_beaker tox
   - pip install -r requirements.txt
-  - pip install pyramid_jinja2==1.10
-  - pip install git+https://github.com/ITCase/sacrud.git@develop
-  - pip install git+https://github.com/ITCase/sacrud_deform.git@master
 
 script:
   - tox
-  - nosetests --with-coverage --cover-package pyramid_sacrud --cover-erase --with-doctest
+  - nosetests --with-coverage --cover-package sacrud_deform --cover-erase --with-doctest
 
 after_success:
   coveralls
