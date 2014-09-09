@@ -91,7 +91,7 @@ class HTMLText(object):
 
 
 class GroupShema(colander.Schema):
-    def __init__(self, relationships, group, columns, table, obj, dbsession,
+    def __init__(self, relationships, group, table, obj, dbsession,
                  **kwargs):
         kwargs['title'] = group
         colander.SchemaNode.__init__(self, colander.Mapping('ignore'), **kwargs)
@@ -100,8 +100,6 @@ class GroupShema(colander.Schema):
         self.relationships = relationships
         self.dbsession = dbsession
         self.js_list = []
-
-        self.add_colums(columns)
 
     def get_column_title(self, col):
         if 'verbose_name' in col.info:
@@ -252,8 +250,9 @@ class SacrudShemaNode(colander.SchemaNode):
 
     def build(self):
         for group, columns in self.visible_columns:
-            gs = GroupShema(self.relationships, group, columns,
-                            self.table, self.obj, self.dbsession)
+            gs = GroupShema(self.relationships, group, self.table, self.obj,
+                            self.dbsession)
+            gs.add_colums(columns)
             self.add(gs)
             for lib in gs.js_list:
                 self.js_list.append(lib)
