@@ -87,7 +87,10 @@ class HTMLText(object):
         self.text = text
 
     def __html__(self):
-        return unicode(self.text)
+        try:
+            return unicode(self.text)
+        except NameError:
+            return str(self.text)
 
 
 class GroupShema(colander.Schema):
