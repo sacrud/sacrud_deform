@@ -113,13 +113,12 @@ class TestFormGroupShema(TestFormBase):
     def setUp(self):
         super(TestFormGroupShema, self).setUp()
         self.columns = MyModel.__table__.columns
-        self.table = MyModel.__table__
+        self.table = MyModel
         relations = sqlalchemy.inspect(MyModel).relationships
         self.relationships = [rel for rel in relations]
 
     def test_group_shema_init(self):
-        gs = GroupShema(self.relationships, "My Group name",
-                        self.table, None, self.session)
+        gs = GroupShema("My Group name", self.table, None, self.session)
         self.assertEqual(gs.obj, None)
         self.assertEqual(gs.table, self.table)
         self.assertEqual(gs.relationships, self.relationships)

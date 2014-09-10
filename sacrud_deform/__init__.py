@@ -12,9 +12,11 @@ from deform import Form
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-from .widgets import (ElfinderWidget, HiddenCheckboxWidget,
-                      HstoreWidget, SlugWidget)
+from sacrud.common import get_relationship
 from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
+
+from .widgets import (ElfinderWidget, HiddenCheckboxWidget, HstoreWidget,
+                      SlugWidget)
 
 # Map sqlalchemy types to colander types.
 _TYPES = {
@@ -89,18 +91,18 @@ class HTMLText(object):
     def __html__(self):
         try:
             return unicode(self.text)
-        except NameError:
-            return str(self.text)
+        except NameError:           # pragma: no cover
+            return str(self.text)   # pragma: no cover
 
 
 class GroupShema(colander.Schema):
-    def __init__(self, relationships, group, table, obj, dbsession,
+    def __init__(self, group, table, obj, dbsession,
                  **kwargs):
         kwargs['title'] = group
         colander.SchemaNode.__init__(self, colander.Mapping('ignore'), **kwargs)
         self.obj = obj
         self.table = table
-        self.relationships = relationships
+        self.relationships = get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
 
@@ -261,8 +263,8 @@ class SacrudShemaNode(colander.SchemaNode):
                 self.js_list.append(lib)
 
 
-def form_generator(relationships, dbsession, **kwargs):
-    schema = SacrudShemaNode(relationships, dbsession, **kwargs)
+def form_generator(dbsession, **kwargs):
+    schema = SacrudShemaNode(dbsession, **kwargs)
     return {'form': Form(schema, ),
             'js_list': schema.js_list,
             }
