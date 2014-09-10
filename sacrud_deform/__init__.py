@@ -96,10 +96,8 @@ class HTMLText(object):
 
 
 class GroupShema(colander.Schema):
-    def __init__(self, group, table, obj, dbsession,
-                 **kwargs):
-        kwargs['title'] = group
-        colander.SchemaNode.__init__(self, colander.Mapping('ignore'), **kwargs)
+    def __init__(self, group, table, obj, dbsession):
+        colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
         self.obj = obj
         self.table = table
         self.relationships = get_relationship(table)
@@ -209,7 +207,7 @@ class GroupShema(colander.Schema):
                 break
         return fk_schema
 
-    def add_colums(self, columns):
+    def build(self, columns):
         for col in columns:
             node = None
             if isinstance(col, (list, tuple)):
@@ -256,7 +254,7 @@ class SacrudShemaNode(colander.SchemaNode):
         for group, columns in self.visible_columns:
             gs = GroupShema(group, self.table, self.obj,
                             self.dbsession)
-            gs.add_colums(columns)
+            gs.build(columns)
             self.add(gs)
             for lib in gs.js_list:
                 self.js_list.append(lib)

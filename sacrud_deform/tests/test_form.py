@@ -15,7 +15,7 @@ import unittest
 import colander
 import deform
 import sqlalchemy
-from sqlalchemy import Column, create_engine, Integer
+from sqlalchemy import Column, create_engine, Integer, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -29,6 +29,7 @@ class MyModel(Base):
     __tablename__ = "mymodel"
 
     pk = Column('id', Integer, primary_key=True)
+    title = Column(Unicode)
 
 
 def add_fixture(model, fixtures, session):
@@ -110,6 +111,9 @@ class TestForm(TestFormBase):
 
 class TestFormGroupShema(TestFormBase):
 
+    def _init_gs(self):
+        return GroupShema("My Group name", self.table, None, self.session)
+
     def setUp(self):
         super(TestFormGroupShema, self).setUp()
         self.columns = MyModel.__table__.columns
@@ -124,3 +128,32 @@ class TestFormGroupShema(TestFormBase):
         self.assertEqual(gs.relationships, self.relationships)
         self.assertEqual(gs.dbsession, self.session)
         self.assertEqual(gs.js_list, [])
+
+    def test_get_column_title(self):
+        gs = self._init_gs()
+        col = MyModel.__table__.c.title
+        title = gs.get_column_title(col)
+        self.assertEqual(title, 'title')
+
+        col.info['verbose_name'] = 'foo'
+        title = gs.get_column_title(col)
+        self.assertEqual(title, 'foo')
+
+        col.info['sacrud_position'] = 'inline'
+        title = gs.get_column_title(col)
+        self.assertEqual(title, 'foo')
+
+        del col.info['verbose_name']
+        col.sacrud_name = 'bar'
+        title = gs.get_column_title(col)
+        self.assertEqual(title, 'bar')
+
+    def test_get_column_description(self):
+        gs = self._init_gs()
+        col = MyModel.__table__.c.title
+        description = gs.get_column_description(col)
+        self.assertEqual(description, None)
+
+        col.info['description'] = 'foo <hr />'
+        description = gs.get_column_description(col)
+        self.assertEqual(description.__html__(), 'foo <hr />')
