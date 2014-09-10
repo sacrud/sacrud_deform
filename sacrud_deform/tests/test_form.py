@@ -164,3 +164,11 @@ class TestFormGroupShema(TestFormBase):
 
         css = gs.get_column_css_styles(col)
         self.assertEqual(css, None)
+
+        MyModel.sacrud_css_class = {'tinymce': [col]}
+        css = gs.get_column_css_styles(col)
+        self.assertEqual(css, 'tinymce')
+
+        col = MyModel.__table__.c.id
+        css = gs.get_column_css_styles(col)
+        self.assertEqual(css, '')

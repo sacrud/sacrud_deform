@@ -12,7 +12,7 @@ from deform import Form
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-from sacrud import common
+from sacrud.common import get_relationship
 from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
 
 from .widgets import (ElfinderWidget, HiddenCheckboxWidget, HstoreWidget,
@@ -100,7 +100,7 @@ class GroupShema(colander.Schema):
         colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
         self.obj = obj
         self.table = table
-        self.relationships = common.get_relationship(table)
+        self.relationships = get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
 
