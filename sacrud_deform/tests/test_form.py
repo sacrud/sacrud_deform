@@ -157,3 +157,10 @@ class TestFormGroupShema(TestFormBase):
         col.info['description'] = 'foo <hr />'
         description = gs.get_column_description(col)
         self.assertEqual(description.__html__(), 'foo <hr />')
+
+    def test_get_column_css_styles(self):
+        gs = self._init_gs()
+        col = MyModel.__table__.c.title
+
+        css = gs.get_column_css_styles(col)
+        self.assertEqual(css, None)

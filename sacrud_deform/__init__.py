@@ -12,7 +12,7 @@ from deform import Form
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-import sacrud
+from sacrud import common
 from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
 
 from .widgets import (ElfinderWidget, HiddenCheckboxWidget, HstoreWidget,
@@ -100,7 +100,7 @@ class GroupShema(colander.Schema):
         colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
         self.obj = obj
         self.table = table
-        self.relationships = sacrud.common.get_relationship(table)
+        self.relationships = common.get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
 
@@ -122,10 +122,10 @@ class GroupShema(colander.Schema):
             return HTMLText(col.info['description'])
         return None
 
-    def get_column_css_styles(self, table, col):
+    def get_column_css_styles(self, col):
         css_class = []
-        if hasattr(table, 'sacrud_css_class'):
-            for key, value in table.sacrud_css_class.items():
+        if hasattr(self.table, 'sacrud_css_class'):
+            for key, value in self.table.sacrud_css_class.items():
                 if col in value:
                     css_class.append(key)
             return ' '.join(css_class)
@@ -220,7 +220,7 @@ class GroupShema(colander.Schema):
             title = self.get_column_title(col)
             default = self.get_col_default_value(col, self.obj)
             description = self.get_column_description(col)
-            css_class = self.get_column_css_styles(self.table, col)
+            css_class = self.get_column_css_styles(col)
             sa_type = self.get_column_type(col)
             params = {'col': col,
                       'sa_types': sa_type,
