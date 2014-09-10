@@ -242,12 +242,11 @@ class GroupShema(colander.Schema):
 
 
 class SacrudShemaNode(colander.SchemaNode):
-    def __init__(self, relationships, dbsession, **kwargs):
+    def __init__(self, dbsession, **kwargs):
         colander.SchemaNode.__init__(self, colander.Mapping('ignore'), **kwargs)
         self.obj = kwargs['obj']
         self.table = kwargs['table']
         self.visible_columns = kwargs['col']
-        self.relationships = relationships
         self.dbsession = dbsession
         self.js_list = []
 
@@ -255,7 +254,7 @@ class SacrudShemaNode(colander.SchemaNode):
 
     def build(self):
         for group, columns in self.visible_columns:
-            gs = GroupShema(self.relationships, group, self.table, self.obj,
+            gs = GroupShema(group, self.table, self.obj,
                             self.dbsession)
             gs.add_colums(columns)
             self.add(gs)
