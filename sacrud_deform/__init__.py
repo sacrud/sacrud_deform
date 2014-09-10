@@ -242,11 +242,11 @@ class GroupShema(colander.Schema):
 
 
 class SacrudShemaNode(colander.SchemaNode):
-    def __init__(self, dbsession, **kwargs):
-        colander.SchemaNode.__init__(self, colander.Mapping('ignore'), **kwargs)
-        self.obj = kwargs['obj']
-        self.table = kwargs['table']
-        self.visible_columns = kwargs['col']
+    def __init__(self, dbsession, obj, table, columns):
+        colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
+        self.obj = obj
+        self.table = table
+        self.visible_columns = columns
         self.dbsession = dbsession
         self.js_list = []
 
@@ -262,8 +262,8 @@ class SacrudShemaNode(colander.SchemaNode):
                 self.js_list.append(lib)
 
 
-def form_generator(dbsession, **kwargs):
-    schema = SacrudShemaNode(dbsession, **kwargs)
+def form_generator(dbsession, obj, table, columns):
+    schema = SacrudShemaNode(dbsession, obj, table, columns)
     return {'form': Form(schema, ),
             'js_list': schema.js_list,
             }
