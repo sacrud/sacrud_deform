@@ -172,3 +172,13 @@ class TestFormGroupShema(TestFormBase):
         col = MyModel.__table__.c.id
         css = gs.get_column_css_styles(col)
         self.assertEqual(css, '')
+
+    def test_get_column_type(self):
+        gs = self._init_gs()
+        col = MyModel.__table__.c.title
+
+        column_type = gs.get_column_type(col)
+        self.assertEqual(column_type, Unicode)
+
+        column_type = gs.get_column_type(None)
+        self.assertEqual(column_type, None)
