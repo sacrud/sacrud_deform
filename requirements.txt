@@ -1,3 +1,4 @@
+git+git://github.com/ITCase/sacrud.git@develop
 SQLAlchemy>=0.8.0b1
 colander>=1.0b1
 deform>=2.0a2
