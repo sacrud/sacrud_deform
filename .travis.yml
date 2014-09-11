@@ -21,7 +21,6 @@ env:
 
 install:
   - pip install nose coverage coveralls tox
-  - pip install git+git://github.com/ITCase/sacrud.git@develop
   - pip install -r requirements.txt
 
 script:

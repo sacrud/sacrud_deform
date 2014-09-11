@@ -1,9 +1,17 @@
+import os
 from setuptools import setup
+
+this = os.path.dirname(os.path.realpath(__file__))
+
+
+def readme():
+    with open(os.path.join(this, 'README.rst')) as f:
+        return f.read()
 
 
 setup(
     name='sacrud_deform',
-    version="0.0.1",
+    version="0.0.2",
     url='http://github.com/ITCase/sacrud_deform/',
     author='Svintsov Dmitry',
     author_email='root@uralbash.ru',
@@ -15,7 +23,7 @@ setup(
     license="MIT",
     package_dir={'sacrud_deform': 'sacrud_deform'},
     description='Form generator for SQLAlchemy models.',
-    long_description="",
+    long_description=readme(),
     install_requires=[
         "sqlalchemy",
         "colander",
