@@ -95,14 +95,15 @@ class HTMLText(object):
             return str(self.text)   # pragma: no cover
 
 
-class GroupShema(colander.Schema):
-    def __init__(self, group, table, obj, dbsession):
-        colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
+class GroupShema(object):
+    def __init__(self, group, table, obj, dbsession, columns):
         self.obj = obj
         self.table = table
         self.relationships = get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
+        self.schema = colander.Schema(name=group)
+        self.build(columns)
 
     def get_column_title(self, col):
         if 'verbose_name' in col.info:
@@ -213,9 +214,8 @@ class GroupShema(colander.Schema):
             if isinstance(col, (list, tuple)):
                 group = col[0]
                 c = col[1]
-                node = GroupShema(group, self.table, self.obj, self.dbsession)
-                node.build(c)
-                self.add(node)
+                gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
+                self.schema.add(gs.schema)
                 continue
             title = self.get_column_title(col)
             default = self.get_col_default_value(col, self.obj)
@@ -236,32 +236,19 @@ class GroupShema(colander.Schema):
                     node = self.get_foreign_key_node(**params)
             if not node:
                 node = self.get_node(**params)
-            self.add(node)
+                self.schema.add(node)
 
 
-class SacrudShemaNode(colander.SchemaNode):
-    def __init__(self, dbsession, obj, table, columns):
-        colander.SchemaNode.__init__(self, colander.Mapping('ignore'))
-        self.obj = obj
-        self.table = table
-        self.visible_columns = columns
-        self.dbsession = dbsession
-        self.js_list = []
+def form_generator(dbsession, obj, table, columns_by_group):
+    schema = colander.Schema()
+    js_list = []
+    for group, columns in columns_by_group:
+        gs = GroupShema(group, table, obj, dbsession,
+                        columns)
+        schema.add(gs.schema)
+        for lib in gs.js_list:
+            js_list.append(lib)
 
-        self.build()
-
-    def build(self):
-        for group, columns in self.visible_columns:
-            gs = GroupShema(group, self.table, self.obj,
-                            self.dbsession)
-            gs.build(columns)
-            self.add(gs)
-            for lib in gs.js_list:
-                self.js_list.append(lib)
-
-
-def form_generator(dbsession, obj, table, columns):
-    schema = SacrudShemaNode(dbsession, obj, table, columns)
     return {'form': Form(schema, ),
-            'js_list': schema.js_list,
+            'js_list': js_list,
             }
