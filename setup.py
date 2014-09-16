@@ -25,6 +25,7 @@ setup(
     description='Form generator for SQLAlchemy models.',
     long_description=readme(),
     install_requires=[
+        "sacrud",
         "sqlalchemy",
         "colander",
         "deform",

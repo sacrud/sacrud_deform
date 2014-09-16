@@ -213,8 +213,8 @@ class GroupShema(colander.Schema):
             if isinstance(col, (list, tuple)):
                 group = col[0]
                 c = col[1]
-                node = GroupShema(self.relationships, group, c,
-                                  self.table, self.obj, self.dbsession)
+                node = GroupShema(group, self.table, self.obj, self.dbsession)
+                node.build(c)
                 self.add(node)
                 continue
             title = self.get_column_title(col)
