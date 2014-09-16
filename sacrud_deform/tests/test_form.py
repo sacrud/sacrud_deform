@@ -112,7 +112,8 @@ class TestForm(TestFormBase):
 class TestFormGroupShema(TestFormBase):
 
     def _init_gs(self):
-        return GroupShema("My Group name", self.table, None, self.session)
+        return GroupShema("My Group name", self.table, None, self.session,
+                          self.columns)
 
     def setUp(self):
         super(TestFormGroupShema, self).setUp()
@@ -122,7 +123,8 @@ class TestFormGroupShema(TestFormBase):
         self.relationships = [rel for rel in relations]
 
     def test_group_shema_init(self):
-        gs = GroupShema("My Group name", self.table, None, self.session)
+        gs = GroupShema("My Group name", self.table, None, self.session,
+                        self.columns)
         self.assertEqual(gs.obj, None)
         self.assertEqual(gs.table, self.table)
         self.assertEqual(gs.relationships, self.relationships)
