@@ -83,6 +83,10 @@ def _get_widget_type_by_sa_type(sa_type):
     return _WIDGETS.get(sa_type) or deform.widget.TextInputWidget
 
 
+def get_validator(widget):
+    return colander.All()
+
+
 class HTMLText(object):
     def __init__(self, text):
         self.text = text
@@ -162,9 +166,11 @@ class GroupShema(object):
                            mask=mask,
                            col=col,
                            mask_placeholder='_',
-                           css_class=css_class)
+                           css_class=css_class,
+                           )
 
-    def get_node(self, values=None, mask=None, **kwargs):
+    def get_node(self, values=None, mask=None, validator=None,
+                 node_kwargs={}, **kwargs):
         column_type = _get_column_type_by_sa_type(kwargs['sa_type'])
         widget_type = _get_widget_type_by_sa_type(kwargs['sa_type'])
         if kwargs['sa_type'] == sa_types.Enum and not values:
@@ -180,15 +186,20 @@ class GroupShema(object):
         widget = self.get_widget(widget_type, values, mask,
                                  kwargs['css_class'],
                                  kwargs['col'])
+        validator = get_validator(widget)
         if widget_type == deform.widget.FileUploadWidget:
             kwargs['description'] = kwargs['default']
             kwargs['default'] = colander.null
+        if kwargs['col'].nullable is True:
+            node_kwargs = {'missing': True}
         return colander.SchemaNode(column_type(),
                                    title=kwargs['title'],
                                    name=kwargs['col'].name,
                                    default=kwargs['default'],
                                    description=kwargs['description'],
                                    widget=widget,
+                                   validator=validator,
+                                   **node_kwargs
                                    )
 
     # TODO: rewrite it
@@ -243,6 +254,4 @@ def form_generator(dbsession, obj, table, columns_by_group):
         for lib in gs.js_list:
             js_list.append(lib)
 
-    return {'form': Form(schema, ),
-            'js_list': js_list,
-            }
+    return Form(schema, ), js_list
