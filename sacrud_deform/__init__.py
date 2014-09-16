@@ -7,16 +7,15 @@
 # Distributed under terms of the MIT license.
 import colander
 import deform
-import sqlalchemy
 from deform import Form
+
+import sqlalchemy
+from sacrud.common import get_relationship
+from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-from sacrud.common import get_relationship
-from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
-
-from .widgets import (ElfinderWidget, HiddenCheckboxWidget, HstoreWidget,
-                      SlugWidget)
+from .widgets import ElfinderWidget, HstoreWidget, SlugWidget
 
 # Map sqlalchemy types to colander types.
 _TYPES = {
@@ -45,7 +44,7 @@ _TYPES = {
 # Map sqlalchemy types to deform widgets.
 _WIDGETS = {
     sa_types.BigInteger: deform.widget.TextInputWidget,
-    sa_types.Boolean: HiddenCheckboxWidget,
+    sa_types.Boolean: deform.widget.CheckboxWidget,
     sa_types.Date: deform.widget.DateInputWidget,
     sa_types.DateTime: deform.widget.DateTimeInputWidget,
     sa_types.Enum: deform.widget.SelectWidget,
@@ -184,29 +183,24 @@ class GroupShema(object):
         if widget_type == deform.widget.FileUploadWidget:
             kwargs['description'] = kwargs['default']
             kwargs['default'] = colander.null
-        node = colander.SchemaNode(column_type(),
+        return colander.SchemaNode(column_type(),
                                    title=kwargs['title'],
                                    name=kwargs['col'].name,
                                    default=kwargs['default'],
                                    description=kwargs['description'],
                                    widget=widget,
                                    )
-        return node
 
     # TODO: rewrite it
     def get_foreign_key_node(self, **kwargs):
         from sacrud.common import pk_to_list
-        fk_schema = colander.Schema()
         kwargs['sa_type'] = sqlalchemy.ForeignKey
         for rel in self.relationships:
             if kwargs['col'] in rel.remote_side or kwargs['col'] in rel.local_columns:
                 choices = self.dbsession.query(rel.mapper).all()
                 choices = [('', '')] + [(getattr(ch, pk_to_list(ch)[0]),
                                          ch.__repr__()) for ch in choices]
-                node = self.get_node(values=choices, **kwargs)
-                fk_schema.add(node)
-                break
-        return fk_schema
+                return self.get_node(values=choices, **kwargs)
 
     def build(self, columns):
         for col in columns:
@@ -236,7 +230,7 @@ class GroupShema(object):
                     node = self.get_foreign_key_node(**params)
             if not node:
                 node = self.get_node(**params)
-                self.schema.add(node)
+            self.schema.add(node)
 
 
 def form_generator(dbsession, obj, table, columns_by_group):
