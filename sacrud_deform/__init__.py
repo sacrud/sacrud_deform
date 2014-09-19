@@ -190,7 +190,8 @@ class GroupShema(object):
         if widget_type == deform.widget.FileUploadWidget:
             kwargs['description'] = kwargs['default']
             kwargs['default'] = colander.null
-        if kwargs['col'].nullable is True:
+        if kwargs['col'].nullable is True or\
+           kwargs['col'].primary_key is True:
             node_kwargs = {'missing': True}
         return colander.SchemaNode(column_type(),
                                    title=kwargs['title'],
