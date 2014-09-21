@@ -34,8 +34,7 @@ Use
 
 .. code-block:: python
 
-        form_data = form_generator(dbsession=DBSession,
+        data = form_generator(dbsession=DBSession,
                                    obj=obj_of_model, table=MyModel,
                                    columns=columns_of_model)
-        form = form_data['form'].render()
-        js_list = form_data['js_list']
+        form, js_list = data.render()
