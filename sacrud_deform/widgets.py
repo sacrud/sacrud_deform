@@ -26,3 +26,7 @@ class SlugWidget(TextInputWidget):
 
 class HiddenCheckboxWidget(CheckboxWidget):
     template = os.path.join(deform_path, 'HiddenCheckbox.pt')
+
+
+class M2MWidget(CheckboxWidget):
+    template = os.path.join(deform_path, 'Many2Many.pt')

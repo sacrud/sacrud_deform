@@ -17,6 +17,6 @@
           tal:replace="field.schema.label" class="checkbox-label" >
     </span>
 
-  </label
+  </label>
 </div>
 

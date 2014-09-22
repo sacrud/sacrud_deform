@@ -7,15 +7,15 @@
 # Distributed under terms of the MIT license.
 import colander
 import deform
-from deform import Form
-
 import sqlalchemy
-from sacrud.common import get_relationship
-from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
+from deform import Form
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-from .widgets import ElfinderWidget, HstoreWidget, SlugWidget
+from sacrud.common import get_relationship
+from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
+
+from .widgets import ElfinderWidget, HstoreWidget, M2MWidget, SlugWidget
 
 # Map sqlalchemy types to colander types.
 _TYPES = {
@@ -217,12 +217,19 @@ class GroupShema(object):
     def build(self, columns):
         for col in columns:
             node = None
+            from pyramid_sacrud.common.custom import WidgetM2M
             if isinstance(col, (list, tuple)):
                 group = col[0]
                 c = col[1]
                 gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
                 self.schema.add(gs.schema)
                 continue
+            elif isinstance(col, WidgetM2M):
+                m2m = colander.SchemaNode(colander.String(),
+                                          widget=M2MWidget())
+                self.schema.add(m2m)
+                continue
+
             title = self.get_column_title(col)
             default = self.get_col_default_value(col, self.obj)
             description = self.get_column_description(col)
