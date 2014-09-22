@@ -217,14 +217,13 @@ class GroupShema(object):
     def build(self, columns):
         for col in columns:
             node = None
-            from pyramid_sacrud.common.custom import WidgetM2M
             if isinstance(col, (list, tuple)):
                 group = col[0]
                 c = col[1]
                 gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
                 self.schema.add(gs.schema)
                 continue
-            elif isinstance(col, WidgetM2M):
+            elif col.__class__.__name__ == "WidgetM2M":
                 m2m = colander.SchemaNode(colander.String(),
                                           widget=M2MWidget())
                 self.schema.add(m2m)
