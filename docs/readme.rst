@@ -32,9 +32,13 @@ from pypi
 Use
 ===
 
+For get column of model use sacrud function :py:func:`sacrud.common.columns_by_group`.
+
 .. code-block:: python
 
+        columns_of_model = columns_by_group(self.table)
         data = form_generator(dbsession=DBSession,
                                    obj=obj_of_model, table=MyModel,
                                    columns=columns_of_model)
         form, js_list = data.render()
+

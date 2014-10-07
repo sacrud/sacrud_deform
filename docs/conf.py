@@ -25,7 +25,7 @@ if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
     _themes = os.path.join(cwd, '_themes')
 
     if not os.path.isdir(_themes):
-        call([git, 'clone', 'git://github.com/Pylons/pylons_sphinx_theme.git',
+        call([git, 'clone', 'git://github.com/ITCase/itcase_sphinx_theme.git',
               '_themes'])
     else:
         os.chdir(_themes)
@@ -61,7 +61,12 @@ if 'sphinx-build' in ' '.join(sys.argv):  # protect against dumb importers
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
 ]
+
+intersphinx_mapping = {
+    'sacrud': ('http://sacrud.readthedocs.org/en/latest/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -77,7 +82,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sacrud_deform'
-copyright = u'2014, Author'
+copyright = u'2014, ITCase'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -131,7 +136,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'pyramid'
+html_theme = 'itcase'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
