@@ -127,7 +127,7 @@ class GroupShema(object):
         return None
 
     def get_column_css_styles(self, col):
-        css_class = []
+        css_class = ['sacrud_deform', ]
         if hasattr(self.table, 'sacrud_css_class'):
             for key, value in self.table.sacrud_css_class.items():
                 if col in value:
