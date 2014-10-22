@@ -37,8 +37,10 @@ For get column of model use sacrud function :py:func:`sacrud.common.columns_by_g
 .. code-block:: python
 
         columns_of_model = columns_by_group(self.table)
-        data = form_generator(dbsession=DBSession,
-                                   obj=obj_of_model, table=MyModel,
-                                   columns=columns_of_model)
-        form, js_list = data.render()
+        data, js_list = form_generator(dbsession=DBSession,
+                                       obj=obj_of_model,
+                                       table=MyModel,
+                                       columns_by_group=columns_of_model,
+                                       request=self.request)
+        form = data.render()
 

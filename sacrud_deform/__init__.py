@@ -180,9 +180,10 @@ class GroupShema(object):
         if kwargs['sa_type'] == ChoiceType and not values:
             values = [(v, k) for k, v in kwargs['col'].type.choices.items()]
         if kwargs['sa_type'] == ElfinderString:
-            self.js_list.append('elfinder.js')
+            self.js_list.append('pyramid_elfinder:static/js/elfinder.min.js')
+            self.js_list.append('pyramid_elfinder:static/js/proxy/elFinderSupportVer1.js')
         if kwargs['sa_type'] == SlugType:
-            self.js_list.append('speakingurl.min.js')
+            self.js_list.append('pyramid_sacrud:static/js/lib/speakingurl.min.js')
         widget = self.get_widget(widget_type, values, mask,
                                  kwargs['css_class'],
                                  kwargs['col'])
@@ -190,8 +191,8 @@ class GroupShema(object):
         if widget_type == deform.widget.FileUploadWidget:
             kwargs['description'] = kwargs['default']
             kwargs['default'] = colander.null
-        if kwargs['col'].nullable is True or\
-           kwargs['col'].primary_key is True:
+        if kwargs['col'].nullable is True or \
+                kwargs['col'].primary_key is True:
             node_kwargs = {'missing': True}
         return colander.SchemaNode(column_type(),
                                    title=kwargs['title'],
@@ -251,14 +252,11 @@ class GroupShema(object):
             self.schema.add(node)
 
 
-def form_generator(dbsession, obj, table, columns_by_group):
+def form_generator(dbsession, obj, table, columns_by_group, request):
     schema = colander.Schema()
     js_list = []
     for group, columns in columns_by_group:
-        gs = GroupShema(group, table, obj, dbsession,
-                        columns)
+        gs = GroupShema(group, table, obj, dbsession, columns)
         schema.add(gs.schema)
-        for lib in gs.js_list:
-            js_list.append(lib)
-
-    return Form(schema, ), js_list
+        js_list.extend(gs.js_list)
+    return Form(schema, request=request), list(set(js_list))
