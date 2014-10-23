@@ -13,7 +13,7 @@ from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
 from sacrud.common import get_relationship
-from sacrud.exttype import ChoiceType, ElfinderString, FileStore, GUID, SlugType
+from sacrud.exttype import ChoiceType, FileStore, GUID, SlugType
 
 from .widgets import ElfinderWidget, HstoreWidget, M2MWidget, SlugWidget
 
@@ -62,7 +62,7 @@ _WIDGETS = {
     sqlalchemy.ForeignKey: deform.widget.SelectWidget,
     ChoiceType: deform.widget.SelectWidget,
     FileStore: deform.widget.FileUploadWidget,
-    ElfinderString: ElfinderWidget,
+    'ElfinderString': ElfinderWidget,
     SlugType: SlugWidget,
 }
 
@@ -179,7 +179,7 @@ class GroupShema(object):
             mask = 'hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh'
         if kwargs['sa_type'] == ChoiceType and not values:
             values = [(v, k) for k, v in kwargs['col'].type.choices.items()]
-        if kwargs['sa_type'] == ElfinderString:
+        if kwargs['sa_type'].__name__ == 'ElfinderString':
             self.js_list.append('pyramid_elfinder:static/js/elfinder.min.js')
             self.js_list.append('pyramid_elfinder:static/js/proxy/elFinderSupportVer1.js')
         if kwargs['sa_type'] == SlugType:
