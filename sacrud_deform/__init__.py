@@ -5,6 +5,8 @@
 # Copyright © 2014 uralbash <root@uralbash.ru>
 #
 # Distributed under terms of the MIT license.
+from gettext import gettext as _
+
 import colander
 import deform
 import sqlalchemy
@@ -99,13 +101,13 @@ class HTMLText(object):
 
 
 class GroupShema(object):
-    def __init__(self, group, table, obj, dbsession, columns):
+    def __init__(self, group, table, obj, dbsession, columns, translate=_):
         self.obj = obj
         self.table = table
         self.relationships = get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
-        self.schema = colander.Schema(name=group)
+        self.schema = colander.Schema(name=translate(group))
         self.build(columns)
 
     def get_column_title(self, col):
@@ -256,7 +258,8 @@ def form_generator(dbsession, obj, table, columns_by_group, request):
     schema = colander.Schema()
     js_list = []
     for group, columns in columns_by_group:
-        gs = GroupShema(group, table, obj, dbsession, columns)
+        gs = GroupShema(group, table, obj, dbsession, columns,
+                        translate=request.localizer.translate)
         schema.add(gs.schema)
         js_list.extend(gs.js_list)
     return Form(schema, request=request), list(set(js_list))
