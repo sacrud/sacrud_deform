@@ -18,7 +18,7 @@ from sacrud.common import get_relationship
 from sacrud.exttype import ChoiceType, FileStore, GUID, SlugType
 try:
     from pyramid_elfinder.models import ElfinderString
-except Exception, e:
+except ImportError:
     ElfinderString = 'ElfinderString'
 
 from .widgets import ElfinderWidget, HstoreWidget, M2MWidget, SlugWidget
