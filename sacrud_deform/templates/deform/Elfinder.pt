@@ -16,9 +16,8 @@
         $(function() {
             var page_html = '<div id="elfinder_${name}" style="display: none;"></div>';
             $('.popup-inner__content-elfinder').append(page_html);
-
             $('#elfinder_${name}').elfinder({
-                url : "${ request.route_url('connector') }",
+                url : "${ request.route_url('elfinder_connector') }",
                 transport : new elFinderSupportVer1(),
                 lang : 'ru',
                 dialog : { width : 900, modal : true },
@@ -54,7 +53,7 @@
 
         // $(document).on('click', '#${oid}', function(event) {
         //     var fm = $('<div/>').dialogelfinder({
-        //         url : '${ field.request.route_url('connector') }',
+        //         url : '${ field.request.route_url('elfinder_connector') }',
         //         lang : 'en',
         //         width : 840,
         //         destroyOnClose : true,

@@ -14,6 +14,10 @@ from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
 from sacrud.common import get_relationship
 from sacrud.exttype import ChoiceType, FileStore, GUID, SlugType
+try:
+    from pyramid_elfinder.models import ElfinderString
+except Exception, e:
+    ElfinderString = 'ElfinderString'
 
 from .widgets import ElfinderWidget, HstoreWidget, M2MWidget, SlugWidget
 
@@ -62,7 +66,7 @@ _WIDGETS = {
     sqlalchemy.ForeignKey: deform.widget.SelectWidget,
     ChoiceType: deform.widget.SelectWidget,
     FileStore: deform.widget.FileUploadWidget,
-    'ElfinderString': ElfinderWidget,
+    ElfinderString: ElfinderWidget,
     SlugType: SlugWidget,
 }
 
