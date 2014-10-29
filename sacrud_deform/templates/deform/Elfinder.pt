@@ -47,7 +47,7 @@
             $('.popup-inner__content-delete').hide();
             $('.popup-inner__content-elfinder').show();
             $('#elfinder_${name}').show();
-            $('.popup').show();
+            $('.popup').css("display", "table");
             event.preventDefault();
         });
 
