@@ -117,6 +117,7 @@ class GroupShema(object):
         self.relationships = get_relationship(table)
         self.dbsession = dbsession
         self.js_list = []
+        self.translate = translate
         self.schema = colander.Schema(name=translate(group))
         self.build(columns)
 
@@ -131,7 +132,7 @@ class GroupShema(object):
                     name = col.info['verbose_name']
                 else:
                     name = col.sacrud_name
-        return name
+        return self.translate(name)
 
     def get_column_description(self, col):
         if 'description' in col.info:
@@ -207,7 +208,7 @@ class GroupShema(object):
                 kwargs['col'].primary_key is True:
             node_kwargs = {'missing': True}
         return colander.SchemaNode(column_type(),
-                                   title=kwargs['title'],
+                                   title=self.translate(kwargs['title']),
                                    name=kwargs['col'].name,
                                    default=kwargs['default'],
                                    description=kwargs['description'],
@@ -242,7 +243,7 @@ class GroupShema(object):
                 selected = [str(pk_to_list(x)[1]) for x in selected]
                 m2m = colander.SchemaNode(
                     colander.Set(),
-                    title=col.info['name'],
+                    title=self.translate(col.info['name']),
                     name=rel_name+'[]',
                     default=selected,
                     widget=deform.widget.SelectWidget(
