@@ -1,4 +1,7 @@
-<div class="many2many">
-    Many2Many
+<div class="many2many"
+    tal:define="
+    name name|field.name;
+    request request|field.request;">
+    ${name}
 </div>
 

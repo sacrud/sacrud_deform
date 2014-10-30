@@ -14,14 +14,16 @@ from deform import Form
 from sqlalchemy import types as sa_types
 from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
-from sacrud.common import get_relationship
+from sacrud.common import get_relationship, pk_to_list
 from sacrud.exttype import ChoiceType, FileStore, GUID, SlugType
+
+from .widgets import ElfinderWidget, HstoreWidget, SlugWidget
+
 try:
     from pyramid_elfinder.models import ElfinderString
 except ImportError:
     ElfinderString = 'ElfinderString'
 
-from .widgets import ElfinderWidget, HstoreWidget, M2MWidget, SlugWidget
 
 # Map sqlalchemy types to colander types.
 _TYPES = {
@@ -71,6 +73,10 @@ _WIDGETS = {
     ElfinderString: ElfinderWidget,
     SlugType: SlugWidget,
 }
+
+
+def _sa_row_to_choises(rows):
+    return [(getattr(ch, pk_to_list(ch)[0]), ch.__repr__()) for ch in rows]
 
 
 def _get_column_type_by_sa_type(sa_type):
@@ -212,13 +218,11 @@ class GroupShema(object):
 
     # TODO: rewrite it
     def get_foreign_key_node(self, **kwargs):
-        from sacrud.common import pk_to_list
         kwargs['sa_type'] = sqlalchemy.ForeignKey
         for rel in self.relationships:
             if kwargs['col'] in rel.remote_side or kwargs['col'] in rel.local_columns:
                 choices = self.dbsession.query(rel.mapper).all()
-                choices = [('', '')] + [(getattr(ch, pk_to_list(ch)[0]),
-                                         ch.__repr__()) for ch in choices]
+                choices = [('', '')] + _sa_row_to_choises(choices)
                 return self.get_node(values=choices, **kwargs)
 
     def build(self, columns):
@@ -231,8 +235,21 @@ class GroupShema(object):
                 self.schema.add(gs.schema)
                 continue
             elif col.__class__.__name__ == "WidgetM2M":
-                m2m = colander.SchemaNode(colander.String(),
-                                          widget=M2MWidget())
+                choices = self.dbsession.query(col.table).all()
+                choices = [('', '')] + _sa_row_to_choises(choices)
+                rel_name = col.relation.key
+                selected = getattr(self.obj, rel_name)
+                selected = [str(pk_to_list(x)[1]) for x in selected]
+                m2m = colander.SchemaNode(
+                    colander.Set(),
+                    title=col.info['name'],
+                    name=rel_name+'[]',
+                    default=selected,
+                    widget=deform.widget.SelectWidget(
+                        values=choices,
+                        multiple=True,
+                    ),
+                )
                 self.schema.add(m2m)
                 continue
 
