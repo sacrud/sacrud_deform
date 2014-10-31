@@ -19,8 +19,11 @@ from sqlalchemy import Column, create_engine, Integer, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from sacrud_deform import (_get_column_type_by_sa_type,
-                           _get_widget_type_by_sa_type, GroupShema, HTMLText)
+from sacrud_deform import GroupShema
+
+from ..common import (_get_column_type_by_sa_type, _get_widget_type_by_sa_type,
+                      HTMLText, get_column_title, get_column_description,
+                      get_column_type)
 
 Base = declarative_base()
 
@@ -132,32 +135,30 @@ class TestFormGroupShema(TestFormBase):
         self.assertEqual(gs.js_list, [])
 
     def test_get_column_title(self):
-        gs = self._init_gs()
         col = MyModel.__table__.c.title
-        title = gs.get_column_title(col)
+        title = get_column_title(col)
         self.assertEqual(title, 'title')
 
         col.info['verbose_name'] = 'foo'
-        title = gs.get_column_title(col)
+        title = get_column_title(col)
         self.assertEqual(title, 'foo')
 
         col.info['sacrud_position'] = 'inline'
-        title = gs.get_column_title(col)
+        title = get_column_title(col)
         self.assertEqual(title, 'foo')
 
         del col.info['verbose_name']
         col.sacrud_name = 'bar'
-        title = gs.get_column_title(col)
+        title = get_column_title(col)
         self.assertEqual(title, 'bar')
 
     def test_get_column_description(self):
-        gs = self._init_gs()
         col = MyModel.__table__.c.title
-        description = gs.get_column_description(col)
+        description = get_column_description(col)
         self.assertEqual(description, None)
 
         col.info['description'] = 'foo <hr />'
-        description = gs.get_column_description(col)
+        description = get_column_description(col)
         self.assertEqual(description.__html__(), 'foo <hr />')
 
     def test_get_column_css_styles(self):
@@ -176,11 +177,10 @@ class TestFormGroupShema(TestFormBase):
         self.assertEqual(css, 'sacrud_deform')
 
     def test_get_column_type(self):
-        gs = self._init_gs()
         col = MyModel.__table__.c.title
 
-        column_type = gs.get_column_type(col)
+        column_type = get_column_type(col)
         self.assertEqual(column_type, Unicode)
 
-        column_type = gs.get_column_type(None)
+        column_type = get_column_type(None)
         self.assertEqual(column_type, None)
