@@ -13,3 +13,11 @@ Widgets
     :members:
     :undoc-members:
     :show-inheritance:
+
+Common
+------
+
+.. automodule:: sacrud_deform.common
+    :members:
+    :undoc-members:
+    :show-inheritance:
