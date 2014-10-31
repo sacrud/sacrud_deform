@@ -235,7 +235,7 @@ class GroupShema(object):
                 gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
                 self.schema.add(gs.schema)
                 continue
-            elif col.__class__.__name__ == "WidgetM2M":
+            elif col.__class__.__name__ == "WidgetRelationship":
                 choices = self.dbsession.query(col.table).all()
                 choices = [('', '')] + _sa_row_to_choises(choices)
                 rel_name = col.relation.key
