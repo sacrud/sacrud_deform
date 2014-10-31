@@ -198,8 +198,7 @@ class GroupShema(object):
         if kwargs['sa_type'] == SlugType:
             self.js_list.append('pyramid_sacrud:static/js/lib/speakingurl.min.js')
         widget = self.get_widget(widget_type, values, mask,
-                                 kwargs['css_class'],
-                                 kwargs['col'])
+                                 kwargs['css_class'], kwargs['col'])
         validator = get_validator(widget)
         if widget_type == deform.widget.FileUploadWidget:
             kwargs['description'] = kwargs['default']
@@ -207,15 +206,16 @@ class GroupShema(object):
         if kwargs['col'].nullable is True or \
                 kwargs['col'].primary_key is True:
             node_kwargs = {'missing': True}
-        return colander.SchemaNode(column_type(),
-                                   title=self.translate(kwargs['title']),
-                                   name=kwargs['col'].name,
-                                   default=kwargs['default'],
-                                   description=kwargs['description'],
-                                   widget=widget,
-                                   validator=validator,
-                                   **node_kwargs
-                                   )
+        default_kwargs = {
+            'title': self.translate(kwargs['title']),
+            'name': kwargs['col'].name,
+            'default': kwargs['default'],
+            'description': kwargs['description'],
+            'widget': widget,
+            'validator': validator,
+        }
+        default_kwargs.update(**node_kwargs)
+        return colander.SchemaNode(column_type(), **default_kwargs)
 
     # TODO: rewrite it
     def get_foreign_key_node(self, **kwargs):
@@ -239,7 +239,7 @@ class GroupShema(object):
                 choices = self.dbsession.query(col.table).all()
                 choices = [('', '')] + _sa_row_to_choises(choices)
                 rel_name = col.relation.key
-                selected = getattr(self.obj, rel_name)
+                selected = getattr(self.obj, rel_name, [])
                 selected = [str(pk_to_list(x)[1]) for x in selected]
                 m2m = colander.SchemaNode(
                     colander.Set(),
