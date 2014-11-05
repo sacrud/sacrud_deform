@@ -12,6 +12,7 @@ Common
 from gettext import gettext as _
 
 import colander
+import json
 import deform
 from sqlalchemy import types as sa_types
 
@@ -32,8 +33,12 @@ class HTMLText(object):
             return str(self.text)   # pragma: no cover
 
 
+def get_pk(obj):
+    return json.dumps(pk_to_list(obj))
+
+
 def _sa_row_to_choises(rows):
-    return [(getattr(ch, pk_to_list(ch)[0]), ch.__repr__()) for ch in rows]
+    return [(get_pk(ch), ch.__repr__()) for ch in rows]
 
 
 def _get_column_type_by_sa_type(sa_type):

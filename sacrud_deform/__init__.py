@@ -13,13 +13,13 @@ import sqlalchemy
 from deform import Form
 from sqlalchemy import types as sa_types
 
-from sacrud.common import get_relationship, pk_to_list
+from sacrud.common import get_relationship
 from sacrud.exttype import ChoiceType, GUID, SlugType
 
 from .common import (_get_column_type_by_sa_type, _get_widget_type_by_sa_type,
                      _sa_row_to_choises, get_column_default_value,
                      get_column_description, get_column_title, get_column_type,
-                     get_validator, get_widget)
+                     get_validator, get_widget, get_pk)
 
 try:
     from pyramid_elfinder.models import ElfinderString
@@ -105,7 +105,12 @@ class GroupShema(object):
                 choices = [('', '')] + _sa_row_to_choises(choices)
                 rel_name = col.relation.key
                 selected = getattr(self.obj, rel_name)
-                selected = [str(pk_to_list(x)[1]) for x in selected]
+                try:
+                    iter(selected)
+                    selected = [get_pk(x) for x in selected]
+                except TypeError:
+                    selected = []
+
                 m2m = colander.SchemaNode(
                     colander.Set(),
                     title=self.translate(col.info['name']),
