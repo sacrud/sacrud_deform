@@ -19,12 +19,7 @@ from sacrud.exttype import ChoiceType, GUID, SlugType
 from .common import (_get_column_type_by_sa_type, _get_widget_type_by_sa_type,
                      _sa_row_to_choises, get_column_default_value,
                      get_column_description, get_column_title, get_column_type,
-                     get_validator, get_widget, get_pk)
-
-try:
-    from pyramid_elfinder.models import ElfinderString
-except ImportError:
-    ElfinderString = 'ElfinderString'
+                     get_pk, get_validator, get_widget)
 
 
 class GroupShema(object):
@@ -49,8 +44,11 @@ class GroupShema(object):
 
     def get_node(self, values=None, mask=None, validator=None,
                  node_kwargs={}, **kwargs):
+        col_name = kwargs['col'].name
         column_type = _get_column_type_by_sa_type(kwargs['sa_type'])
         widget_type = _get_widget_type_by_sa_type(kwargs['sa_type'])
+        if 'col_name' in kwargs:
+            col_name = kwargs['col_name']
         if kwargs['sa_type'] == sa_types.Enum and not values:
             values = [(x, x) for x in kwargs['col'].type.enums]
         if kwargs['sa_type'] == GUID and not mask:
@@ -73,7 +71,7 @@ class GroupShema(object):
             node_kwargs = {'missing': True}
         default_kwargs = {
             'title': self.translate(kwargs['title']),
-            'name': kwargs['col'].name,
+            'name': col_name,
             'default': kwargs['default'],
             'description': kwargs['description'],
             'widget': widget,
@@ -89,6 +87,10 @@ class GroupShema(object):
             if kwargs['col'] in rel.remote_side or kwargs['col'] in rel.local_columns:
                 choices = self.dbsession.query(rel.mapper).all()
                 choices = [('', '')] + _sa_row_to_choises(choices)
+                rel_obj = getattr(self.obj, rel.key)
+                kwargs['col_name'] = rel.key + '[]'
+                if rel_obj:
+                    kwargs['default'] = get_pk(rel_obj)
                 return self.get_node(values=choices, **kwargs)
 
     def build(self, columns):
