@@ -106,12 +106,14 @@ class GroupShema(object):
                 choices = self.dbsession.query(col.table).all()
                 choices = [('', '')] + _sa_row_to_choises(choices)
                 rel_name = col.relation.key
-                selected = getattr(self.obj, rel_name)
-                try:
-                    iter(selected)
-                    selected = [get_pk(x) for x in selected]
-                except TypeError:
-                    selected = []
+                selected = []
+                if self.obj:
+                    selected = getattr(self.obj, rel_name)
+                    try:
+                        iter(selected)
+                        selected = [get_pk(x) for x in selected]
+                    except TypeError:
+                        selected = []
                 m2m = colander.SchemaNode(
                     colander.Set(),
                     title=self.translate(col.info['name']),
