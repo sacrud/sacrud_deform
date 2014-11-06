@@ -57,9 +57,11 @@ class GroupShema(object):
             values = [(v, k) for k, v in kwargs['col'].type.choices.items()]
         if kwargs['sa_type'].__name__ == 'ElfinderString':
             self.js_list.append('pyramid_elfinder:static/js/elfinder.min.js')
-            self.js_list.append('pyramid_elfinder:static/js/proxy/elFinderSupportVer1.js')
+            self.js_list.append('pyramid_elfinder:'
+                                'static/js/proxy/elFinderSupportVer1.js')
         if kwargs['sa_type'] == SlugType:
-            self.js_list.append('pyramid_sacrud:static/js/lib/speakingurl.min.js')
+            self.js_list.append('pyramid_sacrud:'
+                                'static/js/lib/speakingurl.min.js')
         widget = get_widget(widget_type, values, mask, kwargs['css_class'],
                             kwargs['col'])
         validator = get_validator(widget)
@@ -87,7 +89,7 @@ class GroupShema(object):
             if kwargs['col'] in rel.remote_side or kwargs['col'] in rel.local_columns:
                 choices = self.dbsession.query(rel.mapper).all()
                 choices = [('', '')] + _sa_row_to_choises(choices)
-                rel_obj = getattr(self.obj, rel.key)
+                rel_obj = getattr(self.obj, rel.key, None)
                 kwargs['col_name'] = rel.key + '[]'
                 if rel_obj:
                     kwargs['default'] = get_pk(rel_obj)
