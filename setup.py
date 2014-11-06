@@ -11,7 +11,7 @@ def readme():
 
 setup(
     name='sacrud_deform',
-    version="0.0.2",
+    version="0.0.3",
     url='http://github.com/ITCase/sacrud_deform/',
     author='Svintsov Dmitry',
     author_email='root@uralbash.ru',
