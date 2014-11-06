@@ -44,3 +44,12 @@ For get column of model use sacrud function :py:func:`sacrud.common.columns_by_g
                                        request=self.request)
         form = data.render()
 
+Support and Development
+=======================
+
+To report bugs, use the `issue tracker <https://github.com/ITCase/sacrud_deform/issues>`_
+or `waffle board <https://waffle.io/ITCase/sacrud_deform>`_.
+
+We welcome any contribution: suggestions, ideas, commits with new futures, bug fixes, refactoring, docs, tests, translations etc
+
+If you have question, contact me sacrud@uralbash.ru or IRC channel #sacrud
