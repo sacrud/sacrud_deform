@@ -15,7 +15,6 @@ setup(
     url='http://github.com/ITCase/sacrud_deform/',
     author='Svintsov Dmitry',
     author_email='root@uralbash.ru',
-
     packages=['sacrud_deform', ],
     include_package_data=True,
     zip_safe=False,

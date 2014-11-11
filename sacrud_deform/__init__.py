@@ -95,40 +95,46 @@ class GroupShema(object):
                     kwargs['default'] = get_pk(rel_obj)
                 return self.get_node(values=choices, **kwargs)
 
+    def custom_type_preprocessing(self, col):
+        if isinstance(col, (list, tuple)):
+            group = col[0]
+            c = col[1]
+            gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
+            self.schema.add(gs.schema)
+            return True
+        elif col.__class__.__name__ in ("WidgetRelationship",
+                                        "WidgetInlines"):
+            choices = self.dbsession.query(col.table).all()
+            choices = [('', '')] + _sa_row_to_choises(choices)
+            rel_name = col.relation.key
+            selected = []
+            if self.obj:
+                selected = getattr(self.obj, rel_name)
+                try:
+                    iter(selected)
+                    selected = [get_pk(x) for x in selected]
+                except TypeError:
+                    selected = []
+            m2m = colander.SchemaNode(
+                colander.Set(),
+                title=self.translate(col.info['name']),
+                name=rel_name+'[]',
+                default=selected,
+                widget=deform.widget.SelectWidget(
+                    values=choices,
+                    multiple=True,
+                ),
+            )
+            self.schema.add(m2m)
+            return True
+        return False
+
     def build(self, columns):
         for col in columns:
-            node = None
-            if isinstance(col, (list, tuple)):
-                group = col[0]
-                c = col[1]
-                gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
-                self.schema.add(gs.schema)
-                continue
-            elif col.__class__.__name__ == "WidgetRelationship":
-                choices = self.dbsession.query(col.table).all()
-                choices = [('', '')] + _sa_row_to_choises(choices)
-                rel_name = col.relation.key
-                selected = []
-                if self.obj:
-                    selected = getattr(self.obj, rel_name)
-                    try:
-                        iter(selected)
-                        selected = [get_pk(x) for x in selected]
-                    except TypeError:
-                        selected = []
-                m2m = colander.SchemaNode(
-                    colander.Set(),
-                    title=self.translate(col.info['name']),
-                    name=rel_name+'[]',
-                    default=selected,
-                    widget=deform.widget.SelectWidget(
-                        values=choices,
-                        multiple=True,
-                    ),
-                )
-                self.schema.add(m2m)
+            if self.custom_type_preprocessing(col):
                 continue
 
+            node = None
             title = get_column_title(col, self.translate)
             default = get_column_default_value(col, self.obj)
             description = get_column_description(col)
