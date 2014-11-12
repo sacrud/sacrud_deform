@@ -13,20 +13,20 @@ deform_path = os.path.join(cur_path, 'templates', 'deform')
 
 
 class ElfinderWidget(TextInputWidget):
-    template = os.path.join(deform_path, 'Elfinder')
+    template = os.path.join(deform_path, 'Elfinder.pt')
 
 
 class HstoreWidget(TextAreaWidget):
-    template = os.path.join(deform_path, 'Hstore')
+    template = os.path.join(deform_path, 'Hstore.pt')
 
 
 class SlugWidget(TextInputWidget):
-    template = os.path.join(deform_path, 'Slug')
+    template = os.path.join(deform_path, 'Slug.pt')
 
 
 class HiddenCheckboxWidget(CheckboxWidget):
-    template = os.path.join(deform_path, 'HiddenCheckbox')
+    template = os.path.join(deform_path, 'HiddenCheckbox.pt')
 
 
 class M2MWidget(CheckboxWidget):
-    template = os.path.join(deform_path, 'Many2Many')
+    template = os.path.join(deform_path, 'Many2Many.pt')

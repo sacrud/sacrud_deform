@@ -102,8 +102,8 @@ class GroupShema(object):
             gs = GroupShema(group, self.table, self.obj, self.dbsession, c)
             self.schema.add(gs.schema)
             return True
-        elif col.__class__.__name__ in ("WidgetRelationship",
-                                        "WidgetInlines"):
+        elif col.__class__.__name__ == "WidgetRelationship":
+            col.preprocessing()
             choices = self.dbsession.query(col.table).all()
             choices = [('', '')] + _sa_row_to_choises(choices)
             rel_name = col.relation.key
@@ -126,6 +126,11 @@ class GroupShema(object):
                 ),
             )
             self.schema.add(m2m)
+            return True
+        elif col.__class__.__name__ == "WidgetInlines":
+            col.preprocessing()
+            schema = col.schema()
+            self.schema.add(schema)
             return True
         return False
 
