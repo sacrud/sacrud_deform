@@ -60,8 +60,8 @@ class GroupShema(object):
             self.js_list.append('pyramid_elfinder:'
                                 'static/js/proxy/elFinderSupportVer1.js')
         if kwargs['sa_type'] == SlugType:
-            self.js_list.append('pyramid_sacrud:'
-                                'static/js/lib/speakingurl.min.js')
+            self.js_list.append('sacrud_deform:'
+                                'static/js/speakingurl.min.js')
         widget = get_widget(widget_type, values, mask, kwargs['css_class'],
                             kwargs['col'])
         validator = get_validator(widget)
