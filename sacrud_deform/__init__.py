@@ -82,7 +82,6 @@ class GroupShema(object):
         default_kwargs.update(**node_kwargs)
         return colander.SchemaNode(column_type(), **default_kwargs)
 
-    # TODO: rewrite it
     def get_foreign_key_node(self, **kwargs):
         kwargs['sa_type'] = sqlalchemy.ForeignKey
         for rel in self.relationships:
@@ -128,8 +127,7 @@ class GroupShema(object):
             self.schema.add(m2m)
             return True
         elif col.__class__.__name__ == "WidgetInlines":
-            col.preprocessing()
-            schema = col.schema()
+            schema = col.preprocessing()
             self.schema.add(schema)
             return True
         return False
@@ -171,3 +169,7 @@ def form_generator(dbsession, obj, table, columns_by_group, request):
         schema.add(gs.schema)
         js_list.extend(gs.js_list)
     return Form(schema, request=request), list(set(js_list))
+
+
+def includeme(config):
+    config.add_static_view('sacrud_deform_static', 'sacrud_deform:static')
