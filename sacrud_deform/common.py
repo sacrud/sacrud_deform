@@ -106,9 +106,17 @@ def get_column_default_value(col, obj):
     return value
 
 
+class MemoryTmpStore(dict):
+    """ Instances of this class implement the
+    :class:`deform.interfaces.FileUploadTempStore` interface"""
+    def preview_url(self, uid):
+        return None
+
+
 def get_widget(widget_type, values, mask, css_class, col):
     if widget_type == deform.widget.FileUploadWidget:
-        return widget_type(None)
+        tmpstore = MemoryTmpStore()
+        return widget_type(tmpstore)
     return widget_type(values=values,
                        mask=mask,
                        col=col,
