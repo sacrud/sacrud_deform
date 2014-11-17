@@ -127,7 +127,7 @@ class GroupShema(object):
             self.schema.add(m2m)
             return True
         elif col.__class__.__name__ == "WidgetInlines":
-            schema = col.preprocessing()
+            schema = col.preprocessing(self.obj)
             self.schema.add(schema)
             return True
         return False
