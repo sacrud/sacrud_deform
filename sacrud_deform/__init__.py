@@ -144,7 +144,6 @@ class GroupShema(object):
             css_class = self.get_column_css_styles(col)
             sa_type = get_column_type(col)
             params = {'col': col,
-                      'sa_types': sa_type,
                       'title': title,
                       'description': description,
                       'default': default,

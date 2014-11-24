@@ -17,7 +17,8 @@ from sqlalchemy.dialects.postgresql import HSTORE, JSON
 
 from sacrud.exttype import ChoiceType, FileStore, SlugType
 
-from .widgets import ElfinderWidget, HstoreWidget, SlugWidget
+from .widgets import (ElfinderWidget, HiddenCheckboxWidget, HstoreWidget,
+                      SlugWidget)
 
 try:
     from pyramid_elfinder.models import ElfinderString
@@ -51,7 +52,7 @@ _TYPES = {
 # Map sqlalchemy types to deform widgets.
 _WIDGETS = {
     sa_types.BigInteger: deform.widget.TextInputWidget,
-    sa_types.Boolean: deform.widget.CheckboxWidget,
+    sa_types.Boolean: HiddenCheckboxWidget,
     sa_types.Date: deform.widget.DateInputWidget,
     sa_types.DateTime: deform.widget.DateTimeInputWidget,
     sa_types.Enum: deform.widget.SelectWidget,
