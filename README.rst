@@ -10,7 +10,7 @@
    :target: https://pypi.python.org/pypi/sacrud_deform/
 
 sacrud_deform
-==============
+=============
 
 Form generotor for SQLAlchemy models.
 
