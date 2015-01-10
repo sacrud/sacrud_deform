@@ -7,26 +7,28 @@
 # Distributed under terms of the MIT license.
 import colander
 import deform
+from sqlalchemy import Column
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
 
 from colanderalchemy import SQLAlchemySchemaNode
 
 from .common import _sa_row_to_choises, get_pk
+from sacrud.common import columns_by_group
 
 
 def property_value(dbsession, column):
-    choices = dbsession.query(column.property.mapper).all()
+    choices = dbsession.query(column.mapper).all()
     return [('', '')] + _sa_row_to_choises(choices)
 
 
 class SacrudForm(object):
 
-    def __init__(self, dbsession, obj, table, columns_by_group):
+    def __init__(self, dbsession, obj, table):
         self.dbsession = dbsession
         self.obj = obj
         self.table = table
-        self.columns_by_group = columns_by_group
+        self.columns_by_group = columns_by_group(self.table)
         self.schema = colander.Schema()
 
     def build(self):
@@ -52,14 +54,17 @@ class SacrudForm(object):
     def preprocessing(self, columns):
         new_column_list = []
         for column in columns:
-            if not hasattr(column, 'property'):
+            if hasattr(column, 'property'):
+                column = column.property
+            if not isinstance(column, (Column, ColumnProperty,
+                                       RelationshipProperty)):
                 continue
-            elif isinstance(column.property, RelationshipProperty):
+            elif isinstance(column, RelationshipProperty):
                 default = None
                 selected = []
                 relationship = getattr(self.obj, column.key, None)
                 values = property_value(self.dbsession, column)
-                if column.property.direction is MANYTOONE:
+                if column.direction is MANYTOONE:
                     if relationship:
                         default = get_pk(relationship)
                     field = colander.SchemaNode(
@@ -70,7 +75,7 @@ class SacrudForm(object):
                         missing=None,
                         widget=deform.widget.SelectWidget(values=values))
                     new_column_list.append(field)
-                elif column.property.direction in (ONETOMANY, MANYTOMANY):
+                elif column.direction in (ONETOMANY, MANYTOMANY):
                     if relationship:
                         try:
                             iter(relationship)
@@ -89,7 +94,7 @@ class SacrudForm(object):
                         ),
                     )
                     new_column_list.append(field)
-            elif isinstance(column.property, ColumnProperty):
+            elif isinstance(column, (ColumnProperty, Column)):
                 new_column_list.append(column.name)
         return new_column_list
 
