@@ -65,7 +65,7 @@ def get_column_title(col, translate=_):
     if 'verbose_name' in col.info:
         name = col.info['verbose_name']
     else:
-        name = col.name
+        name = getattr(col, 'name', col.key)
     if 'sacrud_position' in col.info:
         if col.info['sacrud_position'] == 'inline':
             if 'verbose_name' in col.info:
