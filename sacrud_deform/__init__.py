@@ -13,19 +13,20 @@ from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
 
 from colanderalchemy import SQLAlchemySchemaNode
 
-from .common import _sa_row_to_choises, get_pk
+from .common import _sa_row_to_choises, get_pk, get_column_title
 from sacrud.common import columns_by_group
 
 
-def property_value(dbsession, column):
+def property_values(dbsession, column):
     choices = dbsession.query(column.mapper).all()
     return [('', '')] + _sa_row_to_choises(choices)
 
 
 class SacrudForm(object):
 
-    def __init__(self, dbsession, obj, table):
+    def __init__(self, dbsession, obj, table, request):
         self.dbsession = dbsession
+        self.translate = request.localizer.translate
         self.obj = obj
         self.table = table
         self.columns_by_group = columns_by_group(self.table)
@@ -48,8 +49,42 @@ class SacrudForm(object):
         return SQLAlchemySchemaNode(self.table,
                                     name=group,
                                     title=group,
-                                    includes=includes,
-                                    excludes=['foo', ])
+                                    includes=includes)
+
+    def get_relationship_schemanode(self, column):
+        default = None
+        selected = []
+        relationship = getattr(self.obj, column.key, None)
+        values = property_values(self.dbsession, column)
+        if column.direction is MANYTOONE:
+            if relationship:
+                default = get_pk(relationship)
+            field = colander.SchemaNode(
+                colander.String(),
+                title=get_column_title(column, self.translate),
+                name=column.key + '[]',
+                default=default,
+                missing=None,
+                widget=deform.widget.SelectWidget(values=values))
+        elif column.direction in (ONETOMANY, MANYTOMANY):
+            if relationship:
+                try:
+                    iter(relationship)
+                    selected = [get_pk(x) for x in relationship]
+                except TypeError:
+                    selected = []
+            field = colander.SchemaNode(
+                colander.Set(),
+                title=get_column_title(column, self.translate),
+                name=column.key + '[]',
+                default=selected,
+                missing=None,
+                widget=deform.widget.SelectWidget(
+                    values=values,
+                    multiple=True,
+                ),
+            )
+        return field
 
     def preprocessing(self, columns):
         new_column_list = []
@@ -60,40 +95,8 @@ class SacrudForm(object):
                                        RelationshipProperty)):
                 continue
             elif isinstance(column, RelationshipProperty):
-                default = None
-                selected = []
-                relationship = getattr(self.obj, column.key, None)
-                values = property_value(self.dbsession, column)
-                if column.direction is MANYTOONE:
-                    if relationship:
-                        default = get_pk(relationship)
-                    field = colander.SchemaNode(
-                        colander.String(),
-                        title=column.key,
-                        name=column.key + '[]',
-                        default=default,
-                        missing=None,
-                        widget=deform.widget.SelectWidget(values=values))
-                    new_column_list.append(field)
-                elif column.direction in (ONETOMANY, MANYTOMANY):
-                    if relationship:
-                        try:
-                            iter(relationship)
-                            selected = [get_pk(x) for x in relationship]
-                        except TypeError:
-                            selected = []
-                    field = colander.SchemaNode(
-                        colander.Set(),
-                        title=column.key,
-                        name=column.key + '[]',
-                        default=selected,
-                        missing=None,
-                        widget=deform.widget.SelectWidget(
-                            values=values,
-                            multiple=True,
-                        ),
-                    )
-                    new_column_list.append(field)
+                field = self.get_relationship_schemanode(column)
+                new_column_list.append(field)
             elif isinstance(column, (ColumnProperty, Column)):
                 new_column_list.append(column.name)
         return new_column_list
