@@ -14,12 +14,21 @@ from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
 from colanderalchemy import SQLAlchemySchemaNode
 
 from .common import _sa_row_to_choises, get_pk, get_column_title
+from sacrud.exttype import ChoiceType
 from sacrud.common import columns_by_group
 
 
 def property_values(dbsession, column):
     choices = dbsession.query(column.mapper).all()
     return [('', '')] + _sa_row_to_choises(choices)
+
+
+def is_choicetype(column):
+    if hasattr(column, 'type') and type(column.type) is ChoiceType:
+        return column.type.choices
+    if hasattr(column, 'columns') and type(column.columns[0].type) is ChoiceType:
+        return column.columns[0].type.choices
+    return False
 
 
 class SacrudForm(object):
@@ -97,8 +106,20 @@ class SacrudForm(object):
             elif isinstance(column, RelationshipProperty):
                 field = self.get_relationship_schemanode(column)
                 new_column_list.append(field)
+            elif is_choicetype(column):
+                field = colander.SchemaNode(
+                    colander.String(),
+                    title=get_column_title(column, self.translate),
+                    name=column.key,
+                    missing=None,
+                    widget=deform.widget.SelectWidget(
+                        values=is_choicetype(column),
+                    ),
+                )
+                new_column_list.append(field)
             elif isinstance(column, (ColumnProperty, Column)):
-                new_column_list.append(column.name)
+                new_column_list.append(getattr(column, 'name',
+                                               getattr(column, 'key')))
         return new_column_list
 
 
