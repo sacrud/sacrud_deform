@@ -7,13 +7,14 @@
 # Distributed under terms of the MIT license.
 import colander
 import deform
-from sqlalchemy import Column
+from sqlalchemy import Column, Boolean
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
 
 from colanderalchemy import SQLAlchemySchemaNode
 
 from .common import _sa_row_to_choises, get_pk, get_column_title
+from .widgets import HiddenCheckboxWidget
 from sacrud.exttype import ChoiceType
 from sacrud.common import columns_by_group
 
@@ -28,6 +29,14 @@ def is_choicetype(column):
         return column.type.choices
     if hasattr(column, 'columns') and type(column.columns[0].type) is ChoiceType:
         return column.columns[0].type.choices
+    return False
+
+
+def is_columntype(column, target):
+    if hasattr(column, 'type') and type(column.type) is target:
+        return True
+    if hasattr(column, 'columns') and type(column.columns[0].type) is target:
+        return True
     return False
 
 
@@ -118,6 +127,15 @@ class SacrudForm(object):
                 )
                 new_column_list.append(field)
             elif isinstance(column, (ColumnProperty, Column)):
+                if is_columntype(column, Boolean):
+                    field = colander.SchemaNode(
+                        colander.Boolean(),
+                        name=column.key,
+                        widget=HiddenCheckboxWidget(),
+                        missing=None,
+                    )
+                    new_column_list.append(field)
+                    continue
                 new_column_list.append(getattr(column, 'name',
                                                getattr(column, 'key')))
         return new_column_list
