@@ -109,6 +109,8 @@ class SacrudForm(object):
         for column in columns:
             if hasattr(column, 'property'):
                 column = column.property
+            if isinstance(column, ColumnProperty):
+                column = column.columns[0]
             if not isinstance(column, (Column, ColumnProperty,
                                        RelationshipProperty)):
                 continue
@@ -130,14 +132,15 @@ class SacrudForm(object):
                 if is_columntype(column, Boolean):
                     field = colander.SchemaNode(
                         colander.Boolean(),
+                        title=get_column_title(column, self.translate),
                         name=column.key,
                         widget=HiddenCheckboxWidget(),
                         missing=None,
                     )
                     new_column_list.append(field)
-                    continue
-                new_column_list.append(getattr(column, 'name',
-                                               getattr(column, 'key')))
+                else:
+                    new_column_list.append(getattr(column, 'name',
+                                                   getattr(column, 'key')))
         return new_column_list
 
 
