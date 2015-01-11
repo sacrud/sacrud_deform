@@ -24,18 +24,8 @@ def property_values(dbsession, column):
     return [('', '')] + _sa_row_to_choises(choices)
 
 
-def is_choicetype(column):
-    if hasattr(column, 'type') and type(column.type) is ChoiceType:
-        return column.type.choices
-    if hasattr(column, 'columns') and type(column.columns[0].type) is ChoiceType:
-        return column.columns[0].type.choices
-    return False
-
-
 def is_columntype(column, target):
     if hasattr(column, 'type') and type(column.type) is target:
-        return True
-    if hasattr(column, 'columns') and type(column.columns[0].type) is target:
         return True
     return False
 
@@ -117,14 +107,14 @@ class SacrudForm(object):
             elif isinstance(column, RelationshipProperty):
                 field = self.get_relationship_schemanode(column)
                 new_column_list.append(field)
-            elif is_choicetype(column):
+            elif is_columntype(column, ChoiceType):
                 field = colander.SchemaNode(
                     colander.String(),
                     title=get_column_title(column, self.translate),
                     name=column.key,
                     missing=None,
                     widget=deform.widget.SelectWidget(
-                        values=is_choicetype(column),
+                        values=column.type.choices,
                     ),
                 )
                 new_column_list.append(field)
