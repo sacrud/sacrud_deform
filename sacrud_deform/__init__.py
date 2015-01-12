@@ -129,8 +129,7 @@ class SacrudForm(object):
                     )
                     new_column_list.append(field)
                 else:
-                    new_column_list.append(getattr(column, 'name',
-                                                   getattr(column, 'key')))
+                    new_column_list.append(column.name)
         return new_column_list
 
 
