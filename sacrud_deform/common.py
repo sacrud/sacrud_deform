@@ -35,11 +35,13 @@ def _sa_row_to_choises(rows):
     return [(get_pk(ch), ch.__repr__()) for ch in rows]
 
 
-def get_column_title(col, translate=_):
-    if 'colanderalchemy' in col.info and 'title' in col.info['colanderalchemy']:
-        name = col.info['colanderalchemy']['title']
-    else:
+def get_column_param(col, name, translate=_):
+    if 'colanderalchemy' in col.info and name in col.info['colanderalchemy']:
+        name = col.info['colanderalchemy'][name]
+    elif name == 'title':
         name = getattr(col, 'name', col.key)
+    else:
+        name = ''
     return translate(name)
 
 

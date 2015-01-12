@@ -13,7 +13,7 @@ from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
 
 from colanderalchemy import SQLAlchemySchemaNode
 
-from .common import _sa_row_to_choises, get_pk, get_column_title
+from .common import _sa_row_to_choises, get_pk, get_column_param
 from .widgets import HiddenCheckboxWidget
 from sacrud.exttype import ChoiceType
 from sacrud.common import columns_by_group
@@ -69,7 +69,9 @@ class SacrudForm(object):
                 default = get_pk(relationship)
             field = colander.SchemaNode(
                 colander.String(),
-                title=get_column_title(column, self.translate),
+                title=get_column_param(column, 'title', self.translate),
+                description=get_column_param(column, 'description',
+                                             self.translate),
                 name=column.key + '[]',
                 default=default,
                 missing=None,
@@ -83,7 +85,9 @@ class SacrudForm(object):
                     selected = []
             field = colander.SchemaNode(
                 colander.Set(),
-                title=get_column_title(column, self.translate),
+                title=get_column_param(column, 'title', self.translate),
+                description=get_column_param(column, 'description',
+                                             self.translate),
                 name=column.key + '[]',
                 default=selected,
                 missing=None,
@@ -110,7 +114,9 @@ class SacrudForm(object):
             elif is_columntype(column, ChoiceType):
                 field = colander.SchemaNode(
                     colander.String(),
-                    title=get_column_title(column, self.translate),
+                    title=get_column_param(column, 'title', self.translate),
+                    description=get_column_param(column, 'description',
+                                                 self.translate),
                     name=column.key,
                     missing=None,
                     widget=deform.widget.SelectWidget(
@@ -122,7 +128,9 @@ class SacrudForm(object):
                 if is_columntype(column, Boolean):
                     field = colander.SchemaNode(
                         colander.Boolean(),
-                        title=get_column_title(column, self.translate),
+                        title=get_column_param(column, 'title', self.translate),
+                        description=get_column_param(column, 'description',
+                                                     self.translate),
                         name=column.key,
                         widget=HiddenCheckboxWidget(),
                         missing=None,
