@@ -12,18 +12,14 @@ test models of sacrud_pages
 
 import unittest
 
-import colander
-import deform
 import sqlalchemy
 from sqlalchemy import Column, create_engine, Integer, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from sacrud_deform import GroupShema
+from sacrud_deform import SacrudForm
 
-from ..common import (_get_column_type_by_sa_type, _get_widget_type_by_sa_type,
-                      HTMLText, get_column_title, get_column_description,
-                      get_column_type)
+from ..common import HTMLText
 
 Base = declarative_base()
 
@@ -95,16 +91,8 @@ class TestFormBase(unittest.TestCase):
 class TestForm(TestFormBase):
 
     def test_tree_initialize(self):
-        self.assertEqual([(x+1,) for x in range(22)],
+        self.assertEqual([(x + 1,) for x in range(22)],
                          self.session.query(MyModel.pk).all())
-
-    def test_column_type_by_sa_type(self):
-        column_type = _get_column_type_by_sa_type(Integer)
-        self.assertEqual(column_type, colander.Integer)
-
-    def test_widget_type_by_sa_type(self):
-        widget_type = _get_widget_type_by_sa_type(Integer)
-        self.assertEqual(widget_type, deform.widget.TextInputWidget)
 
     def test_html_text(self):
         text = HTMLText(u"<hr />Вселенная в Опастносте!")
@@ -114,9 +102,8 @@ class TestForm(TestFormBase):
 
 class TestFormGroupShema(TestFormBase):
 
-    def _init_gs(self):
-        return GroupShema("My Group name", self.table, None, self.session,
-                          self.columns)
+    def _init_gs(self, obj, request):
+        return SacrudForm(self.session, obj, self.table, request)
 
     def setUp(self):
         super(TestFormGroupShema, self).setUp()
@@ -126,61 +113,4 @@ class TestFormGroupShema(TestFormBase):
         self.relationships = [rel for rel in relations]
 
     def test_group_shema_init(self):
-        gs = GroupShema("My Group name", self.table, None, self.session,
-                        self.columns)
-        self.assertEqual(gs.obj, None)
-        self.assertEqual(gs.table, self.table)
-        self.assertEqual(gs.relationships, self.relationships)
-        self.assertEqual(gs.dbsession, self.session)
-        self.assertEqual(gs.js_list, [])
-
-    def test_get_column_title(self):
-        col = MyModel.__table__.c.title
-        title = get_column_title(col)
-        self.assertEqual(title, 'title')
-
-        col.info['verbose_name'] = 'foo'
-        title = get_column_title(col)
-        self.assertEqual(title, 'foo')
-
-        col.info['sacrud_position'] = 'inline'
-        title = get_column_title(col)
-        self.assertEqual(title, 'foo')
-
-        del col.info['verbose_name']
-        col.sacrud_name = 'bar'
-        title = get_column_title(col)
-        self.assertEqual(title, 'bar')
-
-    def test_get_column_description(self):
-        col = MyModel.__table__.c.title
-        description = get_column_description(col)
-        self.assertEqual(description, None)
-
-        col.info['description'] = 'foo <hr />'
-        description = get_column_description(col)
-        self.assertEqual(description.__html__(), 'foo <hr />')
-
-    def test_get_column_css_styles(self):
-        gs = self._init_gs()
-        col = MyModel.__table__.c.title
-
-        css = gs.get_column_css_styles(col)
-        self.assertEqual(css, None)
-
-        MyModel.sacrud_css_class = {'tinymce': [col]}
-        css = gs.get_column_css_styles(col)
-        self.assertEqual(css, 'sacrud_deform tinymce')
-
-        col = MyModel.__table__.c.id
-        css = gs.get_column_css_styles(col)
-        self.assertEqual(css, 'sacrud_deform')
-
-    def test_get_column_type(self):
-        col = MyModel.__table__.c.title
-
-        column_type = get_column_type(col)
-        self.assertEqual(column_type, Unicode)
-
-        column_type = get_column_type(None)
-        self.assertEqual(column_type, None)
+        pass
