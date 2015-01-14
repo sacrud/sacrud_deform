@@ -10,7 +10,7 @@
    :target: https://pypi.python.org/pypi/sacrud_deform/
 
 sacrud_deform
-=============
+==============
 
 Form generotor for SQLAlchemy models.
 
@@ -21,9 +21,8 @@ develop version from source
 
 .. code-block:: bash
 
-  pip install git+git://github.com/ITCase/sacrud_deform@develop
+  pip install git+git://github.com/ITCase/sacrud_deform
 
-from pypi
 
 .. code-block:: bash
 
@@ -36,14 +35,14 @@ For get column of model use sacrud function :py:func:`sacrud.common.columns_by_g
 
 .. code-block:: python
 
-        columns_of_model = columns_by_group(self.table)
-        data, js_list = form_generator(dbsession=DBSession,
-                                       obj=obj_of_model,
-                                       table=MyModel,
-                                       columns_by_group=columns_of_model,
-                                       request=self.request)
-        form = data.render()
+    from sacrud_deform import SacrudForm
+    columns_of_model = columns_by_group(MyModel)
 
+    form = SacrudForm(obj=obj,
+                      dbsession=DBSession,
+                      request=request,
+                      table=self.table).build()
+    form_html = data.render()
 
 Support and Development
 =======================
