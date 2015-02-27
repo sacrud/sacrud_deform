@@ -45,8 +45,9 @@ class SacrudForm(object):
         for group_name, columns in self.columns_by_group:
             group = self.group_schema(group_name, columns)
             self.schema.add(group)
-            appstruct = dict(list({group_name: group.dictify(self.obj)}.items())
-                             + list(appstruct.items()))
+            appstruct = dict(
+                list({group_name: group.dictify(self.obj)}.items())
+                + list(appstruct.items()))
         form = deform.Form(self.schema)
         form.set_appstruct(appstruct)
         return form
@@ -128,7 +129,8 @@ class SacrudForm(object):
                 if is_columntype(column, Boolean):
                     field = colander.SchemaNode(
                         colander.Boolean(),
-                        title=get_column_param(column, 'title', self.translate),
+                        title=get_column_param(column, 'title',
+                                               self.translate),
                         description=get_column_param(column, 'description',
                                                      self.translate),
                         name=column.key,
