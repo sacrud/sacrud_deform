@@ -21,7 +21,7 @@ develop version from source
 
 .. code-block:: bash
 
-  pip install git+git://github.com/ITCase/sacrud_deform
+  pip install git+https://github.com/ITCase/sacrud_deform.git
 
 
 .. code-block:: bash
