@@ -25,7 +25,7 @@ def property_values(dbsession, column):
 
 
 def is_columntype(column, target):
-    if hasattr(column, 'type') and type(column.type) is target:
+    if hasattr(column, 'type') and isinstance(column.type, target):
         return True
     return False
 
@@ -40,7 +40,7 @@ class SacrudForm(object):
         self.columns_by_group = columns_by_group(self.table)
         self.schema = colander.Schema()
 
-    def build(self):
+    def __call__(self):
         appstruct = {}
         for group_name, columns in self.columns_by_group:
             group = self.group_schema(group_name, columns)
@@ -106,6 +106,8 @@ class SacrudForm(object):
                 column = column.property
             if isinstance(column, ColumnProperty):
                 column = column.columns[0]
+
+            # Check types
             if not isinstance(column, (Column, ColumnProperty,
                                        RelationshipProperty)):
                 continue

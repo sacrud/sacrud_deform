@@ -41,7 +41,7 @@ For get column of model use sacrud function :py:func:`sacrud.common.columns_by_g
     form = SacrudForm(obj=obj,
                       dbsession=DBSession,
                       request=request,
-                      table=MyModel).build()
+                      table=MyModel)()
     form_html = data.render()
 
 Support and Development
