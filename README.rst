@@ -31,7 +31,7 @@ develop version from source
 Use
 ===
 
-For get column of model use sacrud function :py:func:`sacrud.common.columns_by_group`.
+For get column of model use sacrud function ``sacrud.common.columns_by_group``.
 
 .. code-block:: python
 
