@@ -1,4 +1,4 @@
-sacrud>=0.2.2
+sacrud>=0.2.4
 colander>=1.0b1
 deform>=2.0a2
 colanderalchemy>=0.3.2
