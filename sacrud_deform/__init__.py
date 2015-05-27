@@ -16,7 +16,7 @@ from colanderalchemy import SQLAlchemySchemaNode
 from .common import _sa_row_to_choises, get_pk, get_column_param
 from .widgets import HiddenCheckboxWidget
 from sacrud.exttype import ChoiceType
-from sacrud.common import columns_by_group
+from sacrud.common import columns_by_group, get_relationship
 
 
 def property_values(dbsession, column):
@@ -30,6 +30,12 @@ def is_columntype(column, target):
     return False
 
 
+def get_single_field_relatioships(table):
+    relationships = get_relationship(table)
+    return {list(rel.local_columns)[0]: rel for rel in relationships
+            if len(rel.local_columns) == 1}
+
+
 class SacrudForm(object):
 
     def __init__(self, dbsession, obj, table, request):
@@ -39,6 +45,7 @@ class SacrudForm(object):
         self.table = table
         self.columns_by_group = columns_by_group(self.table)
         self.schema = colander.Schema()
+        self.relationships = get_single_field_relatioships(self.table)
 
     def __call__(self):
         appstruct = {}
@@ -46,8 +53,9 @@ class SacrudForm(object):
             group = self.group_schema(group_name, columns)
             self.schema.add(group)
             appstruct = dict(
-                list({group_name: group.dictify(self.obj)}.items())
-                + list(appstruct.items()))
+                list({group_name: group.dictify(self.obj)}.items()) +
+                list(appstruct.items())
+            )
         form = deform.Form(self.schema)
         form.set_appstruct(appstruct)
         return form
@@ -102,6 +110,7 @@ class SacrudForm(object):
     def preprocessing(self, columns):
         new_column_list = []
         for column in columns:
+            column = self.relationships.get(column, column)
             if hasattr(column, 'property'):
                 column = column.property
             if isinstance(column, ColumnProperty):
