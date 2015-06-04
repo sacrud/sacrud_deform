@@ -16,9 +16,6 @@ intersphinx_mapping = {
     'sacrud': ('http://sacrud.readthedocs.org/en/latest/', None),
 }
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
-
 # The suffix of source filenames.
 source_suffix = '.rst'
 
