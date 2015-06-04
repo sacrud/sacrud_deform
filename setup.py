@@ -11,7 +11,7 @@ def read(name):
 
 setup(
     name='sacrud_deform',
-    version="0.0.8",
+    version="0.0.9.dev1",
     url='http://github.com/ITCase/sacrud_deform/',
     author='Svintsov Dmitry',
     author_email='root@uralbash.ru',
