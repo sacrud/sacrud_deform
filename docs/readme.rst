@@ -31,18 +31,15 @@ develop version from source
 Use
 ===
 
-For get column of model use sacrud function :py:func:`sacrud.common.columns_by_group`.
-
 .. code-block:: python
 
     from sacrud_deform import SacrudForm
-    columns_of_model = columns_by_group(MyModel)
 
     form = SacrudForm(obj=obj,
                       dbsession=DBSession,
                       request=request,
-                      table=MyModel)()
-    form_html = data.render()
+                      table=MyModel)
+    form_html = form().render()
 
 Support and Development
 =======================
