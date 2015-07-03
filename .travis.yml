@@ -5,7 +5,7 @@
 # Copyright © 2014 uralbash <root@uralbash.ru>
 #
 # Distributed under terms of the MIT license.
-
+sudo: false
 language: python
 
 notifications:
@@ -17,19 +17,12 @@ notifications:
 
 python:
   - "2.7"
-
-env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-
-install:
-  - pip install nose coverage coveralls tox
-  - pip install -r requirements.txt
+  - "3.3"
+  - "3.4"
 
 script:
-  - tox
-  - nosetests --with-coverage --cover-package sacrud_deform --cover-erase --with-doctest
+  python setup.py nosetests
 
 after_success:
-  coveralls
+  - pip install coveralls
+  - coveralls
