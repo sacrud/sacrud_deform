@@ -3,9 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to sacrud_deform's documentation!
-=========================================
-
 .. include:: readme.rst
 
 API
