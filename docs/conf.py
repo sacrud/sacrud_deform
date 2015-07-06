@@ -49,3 +49,10 @@ html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sacrud_deformdoc'
+
+html_theme_options = {
+    'travis_button': True,
+    'github_button': True,
+    'github_user': 'ITCase',
+    'github_repo': 'sacrud_deform',
+}
