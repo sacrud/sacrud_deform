@@ -73,6 +73,12 @@ class SacrudForm(object):
         selected = []
         relationship = getattr(self.obj, column.key, None)
         values = property_values(self.dbsession, column)
+
+        def is_required_field(column):
+            if all([col.nullable for col in column.local_columns]):
+                return None
+            return colander.required
+
         if column.direction is MANYTOONE:
             if relationship:
                 default = get_pk(relationship)
@@ -83,7 +89,7 @@ class SacrudForm(object):
                                              self.translate),
                 name=column.key + '[]',
                 default=default,
-                missing=None,
+                missing=is_required_field(column),
                 widget=deform.widget.SelectWidget(values=values))
         elif column.direction in (ONETOMANY, MANYTOMANY):
             if relationship:
