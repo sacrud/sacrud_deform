@@ -5,18 +5,38 @@
 # Copyright © 2014 uralbash <root@uralbash.ru>
 #
 # Distributed under terms of the MIT license.
-import colander
+import json
+
 import deform
+import colander
 from sqlalchemy import Column, Boolean
-from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.relationships import MANYTOMANY, MANYTOONE, ONETOMANY
-
-from colanderalchemy import SQLAlchemySchemaNode
-
-from .common import _sa_row_to_choises, get_pk, get_column_param
-from .widgets import HiddenCheckboxWidget
-from sacrud.exttype import ChoiceType
 from sacrud.common import columns_by_group, get_relationship
+from sacrud.exttype import ChoiceType
+from colanderalchemy import SQLAlchemySchemaNode
+from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
+from sqlalchemy.orm.relationships import MANYTOONE, ONETOMANY, MANYTOMANY
+from sqlalchemy.dialects.postgresql import JSON, JSONB, HSTORE
+
+from .common import get_pk, get_column_param, _sa_row_to_choises
+from .widgets import HiddenCheckboxWidget
+
+
+class JSONType(colander.SchemaType):
+    def serialize(self, node, appstruct):
+        if appstruct is colander.null:
+            return colander.null
+
+        return json.dumps(appstruct, indent=2, ensure_ascii=False)
+
+    def deserialize(self, node, cstruct):
+        if not cstruct:
+            return colander.null
+
+        try:
+            return json.loads(cstruct)
+        except Exception:
+            raise colander.Invalid(
+                node, '"{}" is not a valid JSON'.format(cstruct))
 
 
 def property_values(dbsession, column):
@@ -48,6 +68,12 @@ class SacrudForm(object):
         self.relationships = get_single_field_relatioships(self.table)
 
     def __call__(self):
+        appstruct = self.make_appstruct()
+        form = deform.Form(self.schema)
+        form.set_appstruct(appstruct)
+        return form
+
+    def make_appstruct(self):
         appstruct = {}
         for group_name, columns in self.columns_by_group:
             group = self.group_schema(group_name, columns)
@@ -56,9 +82,7 @@ class SacrudForm(object):
                 list({group_name: group.dictify(self.obj)}.items()) +
                 list(appstruct.items())
             )
-        form = deform.Form(self.schema)
-        form.set_appstruct(appstruct)
-        return form
+        return appstruct
 
     def group_schema(self, group, columns):
         columns = self.preprocessing(columns)
@@ -142,21 +166,26 @@ class SacrudForm(object):
                     ),
                 )
                 new_column_list.append(field)
+            elif is_columntype(column, (JSON, JSONB, HSTORE)):
+                try:
+                    column.info['colanderalchemy']['typ']
+                except KeyError:
+                    column.info['colanderalchemy']['typ'] = JSONType()
+                new_column_list.append(column.name)
+            elif is_columntype(column, Boolean):
+                field = colander.SchemaNode(
+                    colander.Boolean(),
+                    title=get_column_param(column, 'title',
+                                           self.translate),
+                    description=get_column_param(column, 'description',
+                                                 self.translate),
+                    name=column.key,
+                    widget=HiddenCheckboxWidget(),
+                    missing=None,
+                )
+                new_column_list.append(field)
             elif isinstance(column, (ColumnProperty, Column)):
-                if is_columntype(column, Boolean):
-                    field = colander.SchemaNode(
-                        colander.Boolean(),
-                        title=get_column_param(column, 'title',
-                                               self.translate),
-                        description=get_column_param(column, 'description',
-                                                     self.translate),
-                        name=column.key,
-                        widget=HiddenCheckboxWidget(),
-                        missing=None,
-                    )
-                    new_column_list.append(field)
-                else:
-                    new_column_list.append(column.name)
+                new_column_list.append(column.name)
         return new_column_list
 
 
