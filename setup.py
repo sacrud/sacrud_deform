@@ -11,7 +11,7 @@ def read(name):
 
 setup(
     name='sacrud_deform',
-    version="0.0.9",
+    version="0.0.9.post1",
     url='http://github.com/ITCase/sacrud_deform/',
     author='Svintsov Dmitry',
     author_email='root@uralbash.ru',
@@ -39,6 +39,7 @@ setup(
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Framework :: Pyramid ",
         "Topic :: Internet",
         "Topic :: Database",

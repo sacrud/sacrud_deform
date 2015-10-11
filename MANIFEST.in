@@ -1,3 +1,4 @@
 include README.rst
 include requirements.txt
+include requirements-test.txt
 recursive-include sacrud_deform/templates *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.jinja2 *.js *.html *.xml
