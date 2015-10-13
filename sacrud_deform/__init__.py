@@ -171,6 +171,11 @@ class SacrudForm(object):
                     column.info['colanderalchemy']['typ']
                 except KeyError:
                     column.info['colanderalchemy']['typ'] = JSONType()
+                try:
+                    column.info['colanderalchemy']['widget']
+                except KeyError:
+                    column.info['colanderalchemy']['widget'] =\
+                        deform.widget.TextAreaWidget()
                 new_column_list.append(column.name)
             elif is_columntype(column, Boolean):
                 field = colander.SchemaNode(
