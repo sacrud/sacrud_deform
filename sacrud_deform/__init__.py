@@ -9,9 +9,9 @@ import json
 
 import deform
 import colander
+from saexttype import ChoiceType
 from sqlalchemy import Column, Boolean
 from sacrud.common import columns_by_group, get_relationship
-from sacrud.exttype import ChoiceType
 from colanderalchemy import SQLAlchemySchemaNode
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOONE, ONETOMANY, MANYTOMANY
