@@ -41,7 +41,7 @@ class JSONType(colander.SchemaType):
 
 def property_values(dbsession, column):
     choices = dbsession.query(column.mapper).all()
-    return [('', '')] + _sa_row_to_choises(choices)
+    return [('', '-- Choose your option --')] + _sa_row_to_choises(choices)
 
 
 def is_columntype(column, target):

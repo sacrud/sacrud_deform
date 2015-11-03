@@ -1,5 +1,4 @@
 <div class="checkbox">
-  <label for="${field.oid}">
     <input type='hidden' value='0' name='${field.name}'/>
     <input tal:define="name name|field.name;
                        true_val true_val|field.widget.true_val;
@@ -15,7 +14,5 @@
     <span tal:condition="hasattr(field, 'schema') and hasattr(field.schema, 'label')"
           tal:replace="field.schema.label" class="checkbox-label" >
     </span>
-
-  </label>
+    <label for="${field.oid}"></label>
 </div>
-
