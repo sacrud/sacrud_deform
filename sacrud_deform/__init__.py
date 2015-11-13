@@ -133,6 +133,8 @@ class SacrudForm(object):
                 widget=deform.widget.SelectWidget(
                     values=values,
                     multiple=True,
+                    size="7",
+                    css_class='browser-default'
                 ),
             )
         return field
