@@ -11,7 +11,7 @@ import deform
 import colander
 from sqlalchemy import Column, Boolean
 from sacrud.common import columns_by_group, get_relationship
-from sacrud.exttype import ChoiceType
+from saexttype import ChoiceType
 from colanderalchemy import SQLAlchemySchemaNode
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOONE, ONETOMANY, MANYTOMANY
@@ -21,7 +21,7 @@ from .common import get_pk, get_column_param, _sa_row_to_choises
 from .widgets import HiddenCheckboxWidget
 
 
-class JSONType(colander.SchemaType):
+class JSONType(colander.String):
     def serialize(self, node, appstruct):
         if appstruct is colander.null:
             return colander.null
@@ -34,6 +34,7 @@ class JSONType(colander.SchemaType):
 
         try:
             return json.loads(cstruct)
+            return cstruct
         except Exception:
             raise colander.Invalid(
                 node, '"{}" is not a valid JSON'.format(cstruct))
