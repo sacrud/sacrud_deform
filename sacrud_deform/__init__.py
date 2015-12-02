@@ -21,7 +21,7 @@ from .common import get_pk, get_column_param, _sa_row_to_choises
 from .widgets import HiddenCheckboxWidget
 
 
-class JSONType(colander.String):
+class JSONType(colander.SchemaType):
     def serialize(self, node, appstruct):
         if appstruct is colander.null:
             return colander.null
@@ -33,7 +33,6 @@ class JSONType(colander.String):
             return colander.null
 
         try:
-            return json.loads(cstruct)
             return cstruct
         except Exception:
             raise colander.Invalid(
