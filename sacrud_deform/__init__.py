@@ -58,9 +58,9 @@ def get_single_field_relatioships(table):
 
 class SacrudForm(object):
 
-    def __init__(self, dbsession, obj, table, request):
+    def __init__(self, dbsession, obj, table, request=None):
         self.dbsession = dbsession
-        self.translate = request.localizer.translate
+        self.translate = request.localizer.translate if request else None
         self.obj = obj
         self.table = table
         self.columns_by_group = columns_by_group(self.table)
