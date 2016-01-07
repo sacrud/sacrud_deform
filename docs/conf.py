@@ -24,7 +24,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sacrud_deform'
-copyright = u'2014, ITCase'
+copyright = u'2014, uralbash'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -53,6 +53,6 @@ htmlhelp_basename = 'sacrud_deformdoc'
 html_theme_options = {
     'travis_button': True,
     'github_button': True,
-    'github_user': 'ITCase',
+    'github_user': 'sacrud',
     'github_repo': 'sacrud_deform',
 }

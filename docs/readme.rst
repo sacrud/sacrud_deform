@@ -10,7 +10,7 @@ develop version from source
 
 .. code-block:: bash
 
-  pip install git+https://github.com/ITCase/sacrud_deform.git
+  pip install git+https://github.com/sacrud/sacrud_deform.git
 
 
 .. code-block:: bash
@@ -33,8 +33,8 @@ Use
 Support and Development
 =======================
 
-To report bugs, use the `issue tracker <https://github.com/ITCase/sacrud_deform/issues>`_
-or `waffle board <https://waffle.io/ITCase/sacrud_deform>`_.
+To report bugs, use the `issue tracker <https://github.com/sacrud/sacrud_deform/issues>`_
+or `waffle board <https://waffle.io/sacrud/sacrud_deform>`_.
 
 We welcome any contribution: suggestions, ideas, commits with new futures, bug fixes, refactoring, docs, tests, translations etc
 
