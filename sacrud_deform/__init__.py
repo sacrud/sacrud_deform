@@ -58,16 +58,16 @@ def get_single_field_relatioships(table):
 
 class SacrudForm(object):
 
-    def __init__(self, dbsession, obj, table, request=None):
+    def __init__(self, dbsession, obj, table):
         self.dbsession = dbsession
-        self.translate = request.localizer.translate if request else None
         self.obj = obj
         self.table = table
         self.columns_by_group = columns_by_group(self.table)
         self.schema = colander.Schema()
         self.relationships = get_single_field_relatioships(self.table)
 
-    def __call__(self):
+    def __call__(self, request=None):
+        self.translate = request.localizer.translate if request else None
         appstruct = self.make_appstruct()
         form = deform.Form(self.schema)
         form.set_appstruct(appstruct)
