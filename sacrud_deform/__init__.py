@@ -10,12 +10,13 @@ import json
 import deform
 import colander
 from sqlalchemy import Column, Boolean
-from sacrud.common import columns_by_group, get_relationship
-from saexttype import ChoiceType
 from colanderalchemy import SQLAlchemySchemaNode
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOONE, ONETOMANY, MANYTOMANY
 from sqlalchemy.dialects.postgresql import JSON, JSONB, HSTORE
+
+from saexttype import ChoiceType
+from sacrud.common import columns_by_group, get_relationship
 
 from .common import get_pk, get_column_param, _sa_row_to_choises
 from .widgets import HiddenCheckboxWidget
@@ -141,8 +142,9 @@ class SacrudForm(object):
 
     def preprocessing(self, columns):
         new_column_list = []
-        for column in columns:
-            column = self.relationships.get(column, column)
+        for class_member_name, column in columns.items():
+            if column.foreign_keys:
+                column = self.relationships.get(column, column)
             if hasattr(column, 'property'):
                 column = column.property
             if isinstance(column, ColumnProperty):
@@ -178,7 +180,7 @@ class SacrudForm(object):
                 except KeyError:
                     column.info['colanderalchemy']['widget'] =\
                         deform.widget.TextAreaWidget()
-                new_column_list.append(column.name)
+                new_column_list.append(class_member_name)
             elif is_columntype(column, Boolean):
                 field = colander.SchemaNode(
                     colander.Boolean(),
@@ -192,7 +194,7 @@ class SacrudForm(object):
                 )
                 new_column_list.append(field)
             elif isinstance(column, (ColumnProperty, Column)):
-                new_column_list.append(column.name)
+                new_column_list.append(class_member_name)
         return new_column_list
 
 
