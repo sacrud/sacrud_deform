@@ -9,14 +9,13 @@ import json
 
 import deform
 import colander
+from saexttype import ChoiceType
 from sqlalchemy import Column, Boolean
+from sacrud.common import columns_by_group, get_relationship
 from colanderalchemy import SQLAlchemySchemaNode
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.relationships import MANYTOONE, ONETOMANY, MANYTOMANY
 from sqlalchemy.dialects.postgresql import JSON, JSONB, HSTORE
-
-from saexttype import ChoiceType
-from sacrud.common import columns_by_group, get_relationship
 
 from .common import get_pk, get_column_param, _sa_row_to_choises
 from .widgets import HiddenCheckboxWidget
@@ -142,9 +141,13 @@ class SacrudForm(object):
 
     def preprocessing(self, columns):
         new_column_list = []
-        for class_member_name, column in columns.items():
-            if column.foreign_keys:
-                column = self.relationships.get(column, column)
+        columns = columns.items()
+        for class_member_name, column in columns:
+            if hasattr(column, 'primary_key') and column.primary_key:
+                relation = self.relationships.get(column, column)
+                if hasattr(relation, 'direction') \
+                        and relation.direction == MANYTOMANY:
+                    columns.append((relation.key, relation))
             if hasattr(column, 'property'):
                 column = column.property
             if isinstance(column, ColumnProperty):
