@@ -7,10 +7,14 @@
 # Distributed under terms of the MIT license.
 import json
 
+from pyramid.i18n import get_localizer
+from pyramid.threadlocal import get_current_request
+
 import deform
 import colander
 from saexttype import ChoiceType
 from sqlalchemy import Column, Boolean
+from pkg_resources import resource_filename
 from sacrud.common import columns_by_group, get_relationship
 from colanderalchemy import SQLAlchemySchemaNode
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
@@ -202,4 +206,19 @@ class SacrudForm(object):
 
 
 def includeme(config):
+
+    config.add_translation_dirs(
+        'colander:locale',
+        'deform:locale',
+    )
+
+    def translator(term):
+        return get_localizer(get_current_request()).translate(term)
+
+    deform_template_dir = resource_filename('deform', 'templates/')
+    zpt_renderer = deform.ZPTRendererFactory(
+        [deform_template_dir],
+        translator=translator)
+    deform.Form.set_default_renderer(zpt_renderer)
+
     config.add_static_view('sacrud_deform_static', 'sacrud_deform:static')
