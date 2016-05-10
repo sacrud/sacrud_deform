@@ -13,7 +13,7 @@ from pyramid.threadlocal import get_current_request
 import deform
 import colander
 from saexttype import ChoiceType
-from sqlalchemy import Column, Boolean
+from sqlalchemy import Enum, Column, Boolean
 from pkg_resources import resource_filename
 from sacrud.common import columns_by_group, get_relationship
 from colanderalchemy import SQLAlchemySchemaNode
@@ -145,7 +145,6 @@ class SacrudForm(object):
 
     def preprocessing(self, columns):
         new_column_list = []
-        columns = columns.items()
         for class_member_name, column in columns:
             if hasattr(column, 'primary_key') and column.primary_key:
                 relation = self.relationships.get(column, column)
@@ -157,6 +156,11 @@ class SacrudForm(object):
             if isinstance(column, ColumnProperty):
                 column = column.columns[0]
 
+            try:
+                column.info['colanderalchemy']
+            except KeyError:
+                column.info['colanderalchemy'] = {}
+
             # Check types
             if not isinstance(column, (Column, ColumnProperty,
                                        RelationshipProperty)):
@@ -164,7 +168,11 @@ class SacrudForm(object):
             elif isinstance(column, RelationshipProperty):
                 field = self.get_relationship_schemanode(column)
                 new_column_list.append(field)
-            elif is_columntype(column, ChoiceType):
+            elif is_columntype(column, (ChoiceType, Enum)):
+                if is_columntype(column, Enum):
+                    column.type.choices = zip(
+                        column.type.enums, column.type.enums
+                    )
                 field = colander.SchemaNode(
                     colander.String(),
                     title=get_column_param(column, 'title', self.translate),
@@ -185,7 +193,7 @@ class SacrudForm(object):
                 try:
                     column.info['colanderalchemy']['widget']
                 except KeyError:
-                    column.info['colanderalchemy']['widget'] =\
+                    column.info['colanderalchemy']['widget'] = \
                         deform.widget.TextAreaWidget()
                 new_column_list.append(class_member_name)
             elif is_columntype(column, Boolean):

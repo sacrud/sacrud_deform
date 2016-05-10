@@ -1,5 +1,5 @@
 pyramid
-sacrud==0.3.7
+sacrud>=0.3.7
 saexttype
 colander>=1.0b1
 deform>=2.0a2
