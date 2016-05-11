@@ -183,6 +183,7 @@ class SacrudForm(object):
                     description=get_column_param(column, 'description',
                                                  self.translate),
                     name=column.key,
+                    default=getattr(self.obj, class_member_name, None),
                     missing=None,
                     widget=deform.widget.SelectWidget(
                         values=column.type.choices,
