@@ -151,7 +151,7 @@ class SacrudForm(object):
                 if hasattr(relation, 'direction') \
                         and relation.direction == MANYTOMANY:
                     columns.append((relation.key, relation))
-            elif hasattr(column, 'foreign_keys') and column.foreign_keys:
+            if hasattr(column, 'foreign_keys') and column.foreign_keys:
                 relation = self.relationships.get(column, column)
                 column = relation
                 class_member_name = relation.key
