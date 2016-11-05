@@ -1,4 +1,4 @@
-|Build Status| |Coverage Status| |Stories in Progress| |PyPI|
+|Build Status| |Coverage Status|
 
 .. |Build Status| image:: https://travis-ci.org/sacrud/sacrud_deform.svg?branch=master
    :target: https://travis-ci.org/sacrud/sacrud_deform
